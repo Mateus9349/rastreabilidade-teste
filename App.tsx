@@ -19,7 +19,7 @@ import PeixesRegistrados from "./src/screens/PeixesRegistrados";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 //Configurações dp drizzle
-const DATABASE_NAME = 'database.db01';
+const DATABASE_NAME = 'database.db';
 const expoDB = openDatabaseSync(DATABASE_NAME);
 const db = drizzle(expoDB);
 
