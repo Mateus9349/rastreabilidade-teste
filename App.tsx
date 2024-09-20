@@ -18,13 +18,12 @@ import PeixesRegistrados from "./src/screens/PeixesRegistrados";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-//Configurações dp drizzle
+//Configurações db drizzle
 const DATABASE_NAME = 'database.db';
 const expoDB = openDatabaseSync(DATABASE_NAME);
 const db = drizzle(expoDB);
 
 export default function App() {
-
   const { success, error } = useMigrations(db, migrations);
   
   if (error) {
@@ -43,7 +42,7 @@ export default function App() {
     <SQLiteProvider databaseName={DATABASE_NAME}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}}/>
           <Stack.Screen name="Details" component={DetailsScreen} />
           <Stack.Screen name='RegistrarPeixe' component={RegistrarPeixe} /* options={{headerShown: false}} */ />
           <Stack.Screen name="Teste" component={Teste} />

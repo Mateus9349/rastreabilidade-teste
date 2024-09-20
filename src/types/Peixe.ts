@@ -12,4 +12,5 @@ export interface IPeixe {
   lago: string;
   comunidade: string;
   hEvisceramento: string;
+  hChegadaSalgadeira?: string;
 }

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { IPeixe } from '../../types/Peixe';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import InputHora from '../InputHora';
 
 interface Props {
     onSubmit: (dados: IPeixe) => void;
@@ -47,24 +49,21 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
 
     return (
         <View style={styles.scrollContainer}>
-            <Text>Espécie:</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Digite a espécie"
+                placeholder="Espécie: "
                 value={dados.especie}
                 onChangeText={(value) => handleChange('especie', value)}
             />
 
-            <Text>Cat:</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Digite a categoria"
+                placeholder="Cat:"
                 keyboardType='numeric'
                 value={dados.cat}
                 onChangeText={(value) => handleChange('cat', value)}
             />
 
-            <Text>Lacre:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite o lacre"
@@ -73,7 +72,6 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('lacre', value)}
             />
 
-            <Text>Sexo:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite o sexo"
@@ -81,7 +79,6 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('sexo', value)}
             />
 
-            <Text>Unidade:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite o número"
@@ -89,7 +86,6 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('unidade', value)}
             />
 
-            <Text>Est. gona:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite o estado da gona"
@@ -97,7 +93,6 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('gona', value)}
             />
 
-            <Text>Comprimento:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite o comprimento"
@@ -106,7 +101,6 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('comprimento', value)}
             />
 
-            <Text>Peso:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite o peso"
@@ -115,16 +109,13 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('peso', value)}
             />
 
-            <Text>Horário da pesca:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o horário"
-                keyboardType='numeric'
-                value={dados.hPesca}
-                onChangeText={(value) => handleChange('hPesca', value)}
+            <InputHora
+                text='Horário da pesca'
+                dados={dados}
+                handleDateChange={handleChange}
+                localArmazenamento='hPesca'
             />
 
-            <Text>Lago:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite o lago"
@@ -132,7 +123,6 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('lago', value)}
             />
 
-            <Text>Comunidade:</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Digite a comunidade"
@@ -140,12 +130,11 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                 onChangeText={(value) => handleChange('comunidade', value)}
             />
 
-            <Text>Horário de Evisceramento:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o horário de evisceramento"
-                value={dados.hEvisceramento}
-                onChangeText={(value) => handleChange('hEvisceramento', value)}
+            <InputHora
+                text='Horário de Evisceramento:'
+                dados={dados}
+                handleDateChange={handleChange}
+                localArmazenamento='hEvisceramento'
             />
 
             <View style={styles.btnContainer}>
@@ -161,18 +150,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         flexGrow: 1,
         justifyContent: 'space-between',
-    },
-    label: {
-        fontSize: 16,
-        marginBottom: 8,
+        gap: 10
     },
     input: {
-        height: 40,
-        borderColor: '#ccc',
+        height: 54,
         borderWidth: 1,
-        paddingHorizontal: 8,
-        marginBottom: 16,
-        borderRadius: 4,
+        borderRadius: 7,
+        borderColor: "#999",
+        paddingHorizontal: 16
     },
     btnContainer: {
         marginBottom: 16,

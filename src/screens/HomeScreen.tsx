@@ -1,62 +1,104 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
+import { useCustomFonts } from '../../src/ts/fonts'; // Ajuste o caminho conforme necessário
+import BotaoHome from '../components/BotaoHome';
+import { text } from 'drizzle-orm/mysql-core';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation }: Props) {
+  const [fontsLoaded] = useCustomFonts();
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" style={styles.loader} />;
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Home Screen</Text>
+      <View style={styles.containerUser}>
+        <Image source={require('../../assets/icons/user.png')}/>
+      </View>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RegistrarPeixe')}>
-        <Text style={styles.buttonText}>Registrar peixe</Text>
-      </TouchableOpacity>
+      <Text style={styles.title}>Olá, Fulano</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Details')}>
-        <Text style={styles.buttonText}>Go to Details</Text>
-      </TouchableOpacity>
+      <Text style={styles.text}>Selecione uma opção para começar</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Teste')}>
-        <Text style={styles.buttonText}>Go to Teste</Text>
-      </TouchableOpacity>
+      <BotaoHome
+        onPress={() => navigation.navigate('RegistrarPeixe')}
+        title='Pescas'
+        text='Cadastre novas pescas e monitore pescas atuais'
+        src={require('../../assets/icons/peixe.png')}
+      />
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PeixesRegistrados')}>
-        <Text style={styles.buttonText}>Go to Registros</Text>
-      </TouchableOpacity>
+      <BotaoHome
+        onPress={() => navigation.navigate('Details')}
+        title='Enviar Barco'
+        text='Realize envios dos pescados através dos barcos'
+        src={require('../../assets/icons/enviarBarco.png')}
+      />
+
+      <BotaoHome
+        onPress={() => navigation.navigate('Details')}
+        title='Acompanhar Envios'
+        text='Acompanhe todos os envios dos pescados realizados'
+        src={require('../../assets/icons/envios.png')}
+      />
+
+      <BotaoHome
+        onPress={() => navigation.navigate('Details')}
+        title='Guias de Confirmação'
+        text='Confirme pesagens, barco e documentos para realizar envios'
+        src={require('../../assets/icons/confirmacao.png')}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f5f5f5', // Cor de fundo mais suave
+    display: 'flex',
+    paddingTop: 50,
+    paddingRight: 24,
+    paddingBottom: 58.275,
+    paddingLeft: 24,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    backgroundColor: '#FFF',
+    height: '100%'
   },
+
+  containerUser: {
+    width: 70,
+    height: 70,
+    padding: 28,
+    alignItems: 'center',
+    borderRadius: 35,
+    backgroundColor: '#D9D9D9',
+    marginTop: 50,
+    marginBottom: 17
+  },
+
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    alignSelf: 'stretch',
+    color: '#000',
+    fontFamily: 'Inter-Black', // Corrigido o nome da fonte
+    fontSize: 33, // Ajuste o tamanho conforme necessário
+    fontStyle: 'normal',
+    fontWeight: '700',
   },
-  button: {
-    backgroundColor: '#007bff', // Cor de fundo dos botões
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginVertical: 10,
-    width: '80%', // Largura dos botões
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff', // Cor do texto dos botões
+
+  text: {
+    fontFamily: 'Inter',
     fontSize: 16,
-    fontWeight: '500',
+    fontStyle: 'normal',
+    fontWeight: '300',
+    marginBottom: 32
+  },
+
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
-
-
-
-
