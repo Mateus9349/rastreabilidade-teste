@@ -25,7 +25,7 @@ export default function HomeScreen({ navigation }: Props) {
       <Text style={styles.text}>Selecione uma opção para começar</Text>
 
       <BotaoHome
-        onPress={() => navigation.navigate('RegistrarPeixe')}
+        onPress={() => navigation.navigate('Pescas')}
         title='Pescas'
         text='Cadastre novas pescas e monitore pescas atuais'
         src={require('../../assets/icons/peixe.png')}

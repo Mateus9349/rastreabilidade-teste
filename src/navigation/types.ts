@@ -4,5 +4,6 @@ export type RootStackParamList = {
     RegistrarPeixe: undefined;
     Teste: undefined;
     PeixesRegistrados: undefined;
+    Pescas: undefined;
 };
   

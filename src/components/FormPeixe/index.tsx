@@ -1,29 +1,39 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, Image } from 'react-native';
 import { IPeixe } from '../../types/Peixe';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import InputHora from '../InputHora';
+import InputText from '../InputText';
+import InputSelect from '../InputSelect';
 
 interface Props {
     onSubmit: (dados: IPeixe) => void;
     dadosIniciais?: IPeixe;
 }
 
+const initialDados: IPeixe = {
+    especie: '',
+    cat: '',
+    lacre: '',
+    sexo: '',
+    unidade: '',
+    gona: '',
+    comprimento: '',
+    peso: '',
+    hPesca: '',
+    lago: '',
+    comunidade: '',
+    hEvisceramento: ''
+};
+
 const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
-    const [dados, setDados] = useState<IPeixe>(dadosIniciais || {
-        especie: '',
-        cat: '',
-        lacre: '',
-        sexo: '',
-        unidade: '',
-        gona: '',
-        comprimento: '',
-        peso: '',
-        hPesca: '',
-        lago: '',
-        comunidade: '',
-        hEvisceramento: ''
-    });
+    const [click, setClick] = useState<boolean>(false);
+    const [clickImage, setClickImage] = useState<boolean>(false);
+    const [dados, setDados] = useState<IPeixe>(dadosIniciais || initialDados);
+
+    const handleNextForm = () => {
+        setClick(true);
+        setClickImage(true);
+    }
 
     const handleChange = (field: keyof IPeixe, value: string) => {
         setDados((prev) => ({ ...prev, [field]: value }));
@@ -31,116 +41,141 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
 
     const handleSubmit = () => {
         onSubmit(dados);
-        setDados({
-            especie: '',
-            cat: '',
-            lacre: '',
-            sexo: '',
-            unidade: '',
-            gona: '',
-            comprimento: '',
-            peso: '',
-            hPesca: '',
-            lago: '',
-            comunidade: '',
-            hEvisceramento: ''
-        });
+        setDados(initialDados); // Reseta os dados
+        setClick(false);
+        setClickImage(false);
     };
 
     return (
-        <View style={styles.scrollContainer}>
-            <TextInput
-                style={styles.input}
-                placeholder="Espécie: "
-                value={dados.especie}
-                onChangeText={(value) => handleChange('especie', value)}
-            />
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <View style={styles.cabecalhoContainer}>
+                {!clickImage ? (
+                    <Image source={require('../../../assets/img/Progresso_Status_Bar.png')} style={styles.image} />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Cat:"
-                keyboardType='numeric'
-                value={dados.cat}
-                onChangeText={(value) => handleChange('cat', value)}
-            />
+                ) : (
+                    <Image source={require('../../../assets/img/Progresso_Status_Bar2.png')} style={styles.image} />
+                )}
 
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o lacre"
-                keyboardType='numeric'
-                value={dados.lacre}
-                onChangeText={(value) => handleChange('lacre', value)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o sexo"
-                value={dados.sexo}
-                onChangeText={(value) => handleChange('sexo', value)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o número"
-                value={dados.unidade}
-                onChangeText={(value) => handleChange('unidade', value)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o estado da gona"
-                value={dados.gona}
-                onChangeText={(value) => handleChange('gona', value)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o comprimento"
-                keyboardType='numeric'
-                value={dados.comprimento}
-                onChangeText={(value) => handleChange('comprimento', value)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o peso"
-                keyboardType='numeric'
-                value={dados.peso}
-                onChangeText={(value) => handleChange('peso', value)}
-            />
-
-            <InputHora
-                text='Horário da pesca'
-                dados={dados}
-                handleDateChange={handleChange}
-                localArmazenamento='hPesca'
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o lago"
-                value={dados.lago}
-                onChangeText={(value) => handleChange('lago', value)}
-            />
-
-            <TextInput
-                style={styles.input}
-                placeholder="Digite a comunidade"
-                value={dados.comunidade}
-                onChangeText={(value) => handleChange('comunidade', value)}
-            />
-
-            <InputHora
-                text='Horário de Evisceramento:'
-                dados={dados}
-                handleDateChange={handleChange}
-                localArmazenamento='hEvisceramento'
-            />
-
-            <View style={styles.btnContainer}>
-                <Button title="Enviar" onPress={handleSubmit} />
+                <View style={styles.containerText}>
+                    <Text style={styles.title}>Preencha o formulário</Text>
+                    <Text style={styles.subtitle}>Utilize as informações do pescado</Text>
+                </View>
             </View>
-        </View>
+
+            <View style={styles.formContainer}>
+                {!click ? (
+                    <View style={styles.containerDados}>
+                        <View>
+                            <InputSelect
+                                title='Espécie'
+                                value={dados.especie}
+                                handleValue={(value: string) => handleChange('especie', value)}
+                                label={['Pirarucu', 'Tambaqui', 'Bodeco']}
+                            />
+                            <View style={styles.containerHorizontal}>
+                                <View style={styles.inputWrapper}>
+                                    <InputSelect
+                                        title='Sexo'
+                                        value={dados.sexo}
+                                        handleValue={(value) => handleChange('sexo', value)}
+                                        label={['Macho', 'Fêmea']}
+                                    />
+                                </View>
+                                <InputSelect
+                                    title='Categoria'
+                                    value={dados.cat}
+                                    handleValue={(value) => handleChange('cat', value)}
+                                    label={['IE(Inteiro Eviscerado)', 'I(Inteiro)', 'EM(Em Mantas)']}
+                                />
+                            </View>
+                            <View style={styles.containerHorizontal}>
+                                <View style={styles.inputWrapper}>
+                                    <InputText
+                                        label='Número do lacre'
+                                        placeholder="Digite o lacre"
+                                        value={dados.lacre}
+                                        onChangeText={(value) => handleChange('lacre', value)}
+                                        keyboardType='numeric'
+                                    />
+                                </View>
+                                <InputText
+                                    label='Comprimento'
+                                    placeholder='Comprimento'
+                                    value={dados.comprimento}
+                                    onChangeText={(value) => handleChange('comprimento', value)}
+                                    keyboardType='numeric'
+                                />
+                            </View>
+                            <View style={styles.containerHorizontal}>
+                                <View style={styles.inputWrapper}>
+                                    <InputText
+                                        label='Peso'
+                                        placeholder='Digite o peso'
+                                        value={dados.peso}
+                                        onChangeText={(value) => handleChange('peso', value)}
+                                        keyboardType='numeric'
+                                    />
+                                </View>
+                                <InputSelect
+                                    title='Estágio Gonodal'
+                                    value={dados.gona}
+                                    handleValue={(value) => handleChange('gona', value)}
+                                    label={[
+                                        'I - Roseo sem presença de Ova',
+                                        'II - Roseo com presença de Ova',
+                                        'III - Ovas Verde Claro',
+                                        'IV - Ovas Verde Escuro'
+                                    ]}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={styles.btnContainer}>
+                            <Button title='Continuar' onPress={handleNextForm} />
+                        </View>
+                    </View>
+                ) : (
+                    <View style={styles.containerDados}>
+                        <View>
+                            <View style={styles.containerHorizontal}>
+                                <InputHora
+                                    text='Horário da pesca'
+                                    dados={dados}
+                                    handleDateChange={handleChange}
+                                    localArmazenamento='hPesca'
+                                />
+                                <InputHora
+                                    text='Horário de Evisceramento'
+                                    dados={dados}
+                                    handleDateChange={handleChange}
+                                    localArmazenamento='hEvisceramento'
+                                />
+                            </View>
+                            <View style={styles.containerHorizontal}>
+                                <View style={styles.inputWrapper}>
+                                    <InputText
+                                        label='Lago'
+                                        placeholder="Digite o lago"
+                                        value={dados.lago}
+                                        onChangeText={(value) => handleChange('lago', value)}
+                                    />
+                                </View>
+                                <InputText
+                                    label='Comunidade'
+                                    placeholder="Digite a comunidade"
+                                    value={dados.comunidade}
+                                    onChangeText={(value) => handleChange('comunidade', value)}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={styles.btnContainer}>
+                            <Button title="Enviar" onPress={handleSubmit} />
+                        </View>
+                    </View>
+                )}
+            </View>
+        </ScrollView>
     );
 };
 
@@ -150,17 +185,55 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         flexGrow: 1,
         justifyContent: 'space-between',
-        gap: 10
     },
-    input: {
-        height: 54,
-        borderWidth: 1,
-        borderRadius: 7,
-        borderColor: "#999",
-        paddingHorizontal: 16
+
+
+    cabecalhoContainer: {
+        height: '20%',
+        marginBottom: 20
     },
+    image: {
+        width: '100%',
+        resizeMode: 'contain',
+        marginBottom: 40,
+        marginTop: 20,
+    },
+    containerText: {
+        minHeight: '15%',
+        marginBottom: 32,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    subtitle: {
+        fontSize: 14,
+        marginBottom: 20,
+    },
+
+
+    formContainer: {
+        height: '80%'
+    },
+    containerDados: {
+        flex: 1,
+        justifyContent: 'space-between',
+        height: '100%'
+    },
+    containerHorizontal: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
+    },
+    inputWrapper: {
+        marginRight: 10,
+        width: '47%',
+    },
+
+
     btnContainer: {
-        marginBottom: 16,
+        marginBottom: 30
     },
 });
 

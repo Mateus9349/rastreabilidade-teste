@@ -15,6 +15,7 @@ import RegistrarPeixe from './src/screens/RegistrarPeixe';
 import { View, Text, ActivityIndicator } from "react-native";
 import Teste from "./src/screens/TesteScreen";
 import PeixesRegistrados from "./src/screens/PeixesRegistrados";
+import PescasScreen from "./src/screens/PescasScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -47,6 +48,7 @@ export default function App() {
           <Stack.Screen name='RegistrarPeixe' component={RegistrarPeixe} /* options={{headerShown: false}} */ />
           <Stack.Screen name="Teste" component={Teste} />
           <Stack.Screen name="PeixesRegistrados" component={PeixesRegistrados}/>
+          <Stack.Screen name="Pescas" component={PescasScreen}/>
         </Stack.Navigator>
       </NavigationContainer>
     </SQLiteProvider>

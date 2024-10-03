@@ -26,13 +26,9 @@ export default function RegistrarPeixe({ navigation }: Props) {
     };
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 16 }}>
-            <Text style={{ fontSize: 24, fontWeight: 'bold', marginBottom: 16 }}>Registrar Peixe</Text>
-
+        <View style={{ flex: 1, width: '100%' }}>
             <FormPeixe onSubmit={registrarPeixe} />
-
-            <Button title="Voltar" onPress={() => navigation.goBack()} />
-        </ScrollView>
+        </View>
     );
 }
 
