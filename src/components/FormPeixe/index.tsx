@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, Button, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { IPeixe } from '../../types/Peixe';
 import InputHora from '../InputHora';
 import InputText from '../InputText';
@@ -22,7 +22,7 @@ const initialDados: IPeixe = {
     hPesca: '',
     lago: '',
     comunidade: '',
-    hEvisceramento: ''
+    hEvisceramento: '',
 };
 
 const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
@@ -31,8 +31,12 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
     const [dados, setDados] = useState<IPeixe>(dadosIniciais || initialDados);
 
     const handleNextForm = () => {
-        setClick(true);
-        setClickImage(true);
+        if (dados.especie && dados.sexo && dados.cat && dados.lacre && dados.comprimento && dados.peso && dados.gona !== '') {
+            setClick(true);
+            setClickImage(true);
+        } else {
+            Alert.alert('Preencha todos os campos');
+        }
     }
 
     const handleChange = (field: keyof IPeixe, value: string) => {
@@ -40,10 +44,14 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
     };
 
     const handleSubmit = () => {
-        onSubmit(dados);
-        setDados(initialDados); // Reseta os dados
-        setClick(false);
-        setClickImage(false);
+        if (dados.hPesca && dados.hEvisceramento && dados.lago && dados.comunidade !== '') {
+            onSubmit(dados);
+            setDados(initialDados); // Reseta os dados
+            setClick(false);
+            setClickImage(false);
+        } else {
+            Alert.alert('Preencha todos os campos');
+        }
     };
 
     return (
@@ -78,7 +86,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                                         title='Sexo'
                                         value={dados.sexo}
                                         handleValue={(value) => handleChange('sexo', value)}
-                                        label={['Macho', 'Fêmea']}
+                                        label={['M', 'F']}
                                     />
                                 </View>
                                 <InputSelect
@@ -130,9 +138,9 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                             </View>
                         </View>
 
-                        <View style={styles.btnContainer}>
-                            <Button title='Continuar' onPress={handleNextForm} />
-                        </View>
+                        <TouchableOpacity style={styles.btnContainer} onPress={handleNextForm}>
+                            <Text style={styles.btnText}>Continuar</Text>
+                        </TouchableOpacity>
                     </View>
                 ) : (
                     <View style={styles.containerDados}>
@@ -169,9 +177,9 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                             </View>
                         </View>
 
-                        <View style={styles.btnContainer}>
-                            <Button title="Enviar" onPress={handleSubmit} />
-                        </View>
+                        <TouchableOpacity style={styles.btnContainer} onPress={handleSubmit}>
+                            <Text style={styles.btnText}>Finalizar</Text>
+                        </TouchableOpacity>
                     </View>
                 )}
             </View>
@@ -203,11 +211,13 @@ const styles = StyleSheet.create({
         marginBottom: 32,
     },
     title: {
+        color: '#2C205E',
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
     },
     subtitle: {
+        color: '#2C205E',
         fontSize: 14,
         marginBottom: 20,
     },
@@ -233,7 +243,17 @@ const styles = StyleSheet.create({
 
 
     btnContainer: {
-        marginBottom: 30
+        marginBottom: 30,
+        backgroundColor: '#200393',
+        borderRadius: 8,
+        height: 36,
+        justifyContent: 'center'
+    },
+    btnText: {
+        color: 'white',
+        fontSize: 15,
+        textAlign: 'center',
+        fontWeight: '800'
     },
 });
 

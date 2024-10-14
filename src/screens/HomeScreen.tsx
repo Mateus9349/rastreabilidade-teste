@@ -32,7 +32,7 @@ export default function HomeScreen({ navigation }: Props) {
       />
 
       <BotaoHome
-        onPress={() => navigation.navigate('Details')}
+        onPress={() => navigation.navigate('GuiaDeTransporte')}
         title='Enviar Barco'
         text='Realize envios dos pescados através dos barcos'
         src={require('../../assets/icons/enviarBarco.png')}
@@ -46,7 +46,7 @@ export default function HomeScreen({ navigation }: Props) {
       />
 
       <BotaoHome
-        onPress={() => navigation.navigate('Details')}
+        onPress={() => navigation.navigate('GuiaDeConfirmacao')}
         title='Guias de Confirmação'
         text='Confirme pesagens, barco e documentos para realizar envios'
         src={require('../../assets/icons/confirmacao.png')}

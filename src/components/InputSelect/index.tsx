@@ -1,31 +1,41 @@
 import { Picker } from "@react-native-picker/picker";
 import { View, Text, StyleSheet } from "react-native";
-import { IPeixe } from "../../types/Peixe";
+import { useState } from "react";
 
 interface Props {
     title: string;
-    value: string;
+    value: string;  // valor passado deve ser uma string
     handleValue: (value: string) => void;
     label: string[];
+    errorMessage?: string;
 }
 
-export default function InputSelect({ title, value, handleValue, label }: Props) {
+export default function InputSelect({ title, value = "", handleValue, label, errorMessage }: Props) {
+    const [touched, setTouched] = useState(false);
+
     return (
         <View style={styles.container}>
             <Text style={styles.text}>{title}</Text>
             <View style={styles.containerPicker}>
                 <Picker
-                    selectedValue={value}
+                    selectedValue={value || ""}  // garanta que o valor nunca seja undefined
                     style={styles.picker}
-                    onValueChange={handleValue}
+                    onValueChange={(itemValue) => {
+                        handleValue(itemValue);
+                        setTouched(true);
+                    }}
                 >
+                    <Picker.Item label="Selecione uma opção" value="" />
                     {label.map((item, index) => (
                         <Picker.Item style={styles.pickerItem} key={index} label={item} value={item} />
                     ))}
                 </Picker>
             </View>
+            {touched && value === "" && (
+                <Text style={styles.errorText}>{errorMessage || "Esse campo é obrigatório"}</Text>
+            )}
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -33,7 +43,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     text: {
-        color: '#4B45E',
+        color: '#2C205E',
         fontFamily: 'Inter',
         marginBottom: 2
     },
@@ -50,5 +60,9 @@ const styles = StyleSheet.create({
     pickerItem: {
         color: '#BBBBBB',
         fontSize: 14
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 12,
     },
 });
