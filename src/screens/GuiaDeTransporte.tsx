@@ -19,8 +19,8 @@ export default function GuiaDeTransporte({ navigation }: Props) {
   async function fetchLotes() {
     try {
       const response = await db.query.lote.findMany();
-      console.log(response[0].peixes);
-      setLotes(response);
+      const lotesAtivos = response.filter(lote => lote.ativo === 1);
+      setLotes(lotesAtivos);
     } catch (error) {
       console.log(error);
     }
@@ -45,7 +45,7 @@ export default function GuiaDeTransporte({ navigation }: Props) {
             try {
               await db
                 .delete(loteSchema.lote)
-                .where(eq(loteSchema.lote.id, id)); // Ajuste conforme a sintaxe correta da Drizzle ORM
+                .where(eq(loteSchema.lote.id, id));
 
               await fetchLotes();
             } catch (error) {
@@ -61,7 +61,7 @@ export default function GuiaDeTransporte({ navigation }: Props) {
 
   useEffect(() => {
     fetchLotes();
-  }, [])
+  }, [lotes])
 
   return (
     <>

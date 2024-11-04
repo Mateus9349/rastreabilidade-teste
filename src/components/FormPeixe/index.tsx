@@ -31,7 +31,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
     const [dados, setDados] = useState<IPeixe>(dadosIniciais || initialDados);
 
     const handleNextForm = () => {
-        if (dados.especie && dados.sexo && dados.cat && dados.lacre && dados.comprimento && dados.peso && dados.gona !== '') {
+        if (/* dados.especie && */ dados.sexo /* && dados.cat */ && dados.lacre && dados.comprimento && dados.peso && dados.gona !== '') {
             setClick(true);
             setClickImage(true);
         } else {
@@ -58,28 +58,30 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.cabecalhoContainer}>
                 {!clickImage ? (
-                    <Image source={require('../../../assets/img/Progresso_Status_Bar.png')} style={styles.image} />
-
+                    <>
+                        <Image source={require('../../../assets/img/Progresso_Status_Bar.png')} style={styles.image} />
+                        <View style={styles.containerText}>
+                            <Text style={styles.title}>Preencha o formulário</Text>
+                            <Text style={styles.subtitle}>Utilize as informações do pescado</Text>
+                        </View>
+                    </>
                 ) : (
                     <Image source={require('../../../assets/img/Progresso_Status_Bar2.png')} style={styles.image} />
                 )}
-
-                <View style={styles.containerText}>
-                    <Text style={styles.title}>Preencha o formulário</Text>
-                    <Text style={styles.subtitle}>Utilize as informações do pescado</Text>
-                </View>
             </View>
 
             <View style={styles.formContainer}>
                 {!click ? (
                     <View style={styles.containerDados}>
                         <View>
-                            <InputSelect
+
+                            {/* <InputSelect
                                 title='Espécie'
                                 value={dados.especie}
                                 handleValue={(value: string) => handleChange('especie', value)}
                                 label={['Pirarucu', 'Tambaqui', 'Bodeco']}
-                            />
+                            /> */}
+
                             <View style={styles.containerHorizontal}>
                                 <View style={styles.inputWrapper}>
                                     <InputSelect
@@ -89,13 +91,15 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                                         label={['M', 'F']}
                                     />
                                 </View>
-                                <InputSelect
+
+                                {/* <InputSelect
                                     title='Categoria'
                                     value={dados.cat}
                                     handleValue={(value) => handleChange('cat', value)}
                                     label={['IE(Inteiro Eviscerado)', 'I(Inteiro)', 'EM(Em Mantas)']}
-                                />
+                                /> */}
                             </View>
+
                             <View style={styles.containerHorizontal}>
                                 <View style={styles.inputWrapper}>
                                     <InputText
@@ -106,6 +110,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                                         keyboardType='numeric'
                                     />
                                 </View>
+
                                 <InputText
                                     label='Comprimento'
                                     placeholder='Comprimento'
@@ -114,6 +119,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                                     keyboardType='numeric'
                                 />
                             </View>
+
                             <View style={styles.containerHorizontal}>
                                 <View style={styles.inputWrapper}>
                                     <InputText
@@ -124,6 +130,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                                         keyboardType='numeric'
                                     />
                                 </View>
+
                                 <InputSelect
                                     title='Estágio Gonodal'
                                     value={dados.gona}
@@ -168,6 +175,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                                         onChangeText={(value) => handleChange('lago', value)}
                                     />
                                 </View>
+
                                 <InputText
                                     label='Comunidade'
                                     placeholder="Digite a comunidade"

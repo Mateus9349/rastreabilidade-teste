@@ -13,4 +13,5 @@ export interface IPeixe {
   comunidade: string;
   hEvisceramento: string;
   hChegadaSalgadeira?: string;
+  ativo?: number;
 }

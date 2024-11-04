@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { useCustomFonts } from '../../src/ts/fonts'; // Ajuste o caminho conforme necessário
+import { useCustomFonts } from '../types/ts/fonts'; // Ajuste o caminho conforme necessário
 import BotaoHome from '../components/BotaoHome';
 import { text } from 'drizzle-orm/mysql-core';
 
@@ -35,21 +35,21 @@ export default function HomeScreen({ navigation }: Props) {
         onPress={() => navigation.navigate('GuiaDeTransporte')}
         title='Enviar Barco'
         text='Realize envios dos pescados através dos barcos'
-        src={require('../../assets/icons/enviarBarco.png')}
+        src={require('../../assets/icons/enviar.png')}
       />
 
-      <BotaoHome
+      {/* <BotaoHome
         onPress={() => navigation.navigate('Details')}
         title='Acompanhar Envios'
         text='Acompanhe todos os envios dos pescados realizados'
         src={require('../../assets/icons/envios.png')}
-      />
+      /> */}
 
       <BotaoHome
         onPress={() => navigation.navigate('GuiaDeConfirmacao')}
         title='Guias de Confirmação'
         text='Confirme pesagens, barco e documentos para realizar envios'
-        src={require('../../assets/icons/confirmacao.png')}
+        src={require('../../assets/icons/check.png')}
       />
     </View>
   );
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     paddingLeft: 24,
     flexDirection: 'column',
     alignItems: 'flex-start',
-    backgroundColor: '#FFF',
+    backgroundColor: 'white',
     height: '100%'
   },
 
@@ -74,14 +74,14 @@ const styles = StyleSheet.create({
     padding: 28,
     alignItems: 'center',
     borderRadius: 35,
-    backgroundColor: '#D9D9D9',
+    backgroundColor: '#200393',
     marginTop: 50,
     marginBottom: 17
   },
 
   title: {
     alignSelf: 'stretch',
-    color: '#000',
+    color: '#2C205E',
     fontFamily: 'Inter-Black', // Corrigido o nome da fonte
     fontSize: 33, // Ajuste o tamanho conforme necessário
     fontStyle: 'normal',
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
+    color: '#4B465E',
     fontFamily: 'Inter',
     fontSize: 16,
     fontStyle: 'normal',

@@ -6,7 +6,7 @@ const BotaoHome = ({ onPress, title, text, src }: { onPress: () => void; title: 
             <Image style={styles.icon} source={src} />
             <View style={styles.containerText}>
                 <Text style={styles.title}>{title}</Text>
-                <Text>{text}</Text>
+                <Text style={styles.text}>{text}</Text>
             </View>
         </TouchableOpacity>
     )
@@ -16,7 +16,7 @@ export default BotaoHome;
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: '#F5F5F5', // Cor de fundo dos botões
+        backgroundColor: '#F7F9FF', // Cor de fundo dos botões
         borderRadius: 16,
         display: 'flex',
         flexDirection: 'row',
@@ -43,14 +43,14 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        color: 'black', // Cor do texto dos botões
+        color: '#200393', // Cor do texto dos botões
         fontSize: 16,
         fontWeight: '500',
         marginBottom: 4
     },
 
     text: {
-        color: '#000', // Cor preta para o texto
+        color: '#445172', // Cor preta para o texto
         fontFamily: 'Inter', // Fonte Inter
         fontSize: 13, // Tamanho da fonte em px
         fontStyle: 'normal', // Estilo normal da fonte

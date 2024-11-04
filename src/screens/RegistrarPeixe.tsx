@@ -19,8 +19,15 @@ export default function RegistrarPeixe({ navigation }: Props) {
 
     const registrarPeixe = async (dados: IPeixe) => {
         try {
-            const response = await db.insert(peixeSchema.peixe).values(dados);
-            setPescaRegistrada(true);
+            const peixesRegistrados: IPeixe[] = await db.query.peixe.findMany();
+            const lacreExistente = peixesRegistrados.some(peixe => peixe.lacre === dados.lacre);
+
+            if (lacreExistente) {
+                Alert.alert('Já existe um pescado com este número de lacre!');
+            } else {
+                await db.insert(peixeSchema.peixe).values(dados);
+                setPescaRegistrada(true);
+            }
         } catch (error) {
             console.error("Erro ao cadastrar o peixe:", error);
             Alert.alert("Erro", "Não foi possível cadastrar o peixe. Tente novamente.");

@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 16,
-        backgroundColor: '#E0E0E0'
+        backgroundColor: '#F1F5FF'
     },
     containerImagemText: {
         display: 'flex',
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     },
     title: {
         alignSelf: 'stretch',
-        color: '#000',
+        color: '#200393',
         textAlign: 'center',
         fontFamily: 'Inter',
         fontSize: 13,
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     },
     text: {
         alignSelf: 'stretch',
-        color: '#000000',
+        color: '#445172',
         textAlign: 'center',
         fontFamily: 'Inter',
         fontSize: 11,

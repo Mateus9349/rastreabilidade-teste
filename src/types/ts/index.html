@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a73e8;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .container {
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #d32f2f;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1a73e8;
+            color: white;
+        }
+
+        span{
+            font-weight: 400;
+        }
+
+        .horizontal {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <section>
+            <h1>FUNDAÇÃO AMAZÔNIA SUSTENTÁVEL</h1>
+            <h1>COORDENAÇÃO TÉCNICA FAS</h1>
+            <h1>PLANILHA DE CONTROLE E MONITORAMENTO</h1>
+        </section>
+
+        <section>
+            <div class="horizontal">
+                <h3>Assistente: <span>Mateus Vinicius Passos de Lima</span></h3>
+            </div>
+
+            <div class="horizontal">
+                <h3>Comunidade: <span>Jussara</span></h3>
+                <h3>Setor: <span>Silviara</span></h3>
+                <h3>Barco: <span>Jussara</span></h3>
+                <h3>Data: <span>18-09-2023</span></h3>
+            </div>
+
+            <div class="horizontal">
+                <h3>Fêmeas: <span>60</span> <br> Machos: <span>30</span></h3>
+                <h3>Quantidade total: <span>60</span></h3>
+                <h3>Peso total: <span>2.660</span></h3>
+            </div>
+        </section>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Esp.</th>
+                    <th>Lacre</th>
+                    <th>Qtid.</th>
+                    <th>Cat</th>
+                    <th>CT(cm)</th>
+                    <th>Peso(kg)</th>
+                    <th>Sexo</th>
+                    <th>Est. Gona</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- Linhas da tabela serão inseridas aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const peixesMock = [
+            {
+                id: 1,
+                especie: 'Peixe Espada',
+                lacre: 'ABC123',
+                cat: 'A',
+                sexo: 'M',
+                unidade: 'Kg',
+                gona: 'G1',
+                comprimento: '50 cm',
+                peso: '1.5 Kg',
+                hPesca: '08:30',
+                lago: 'Lago Azul',
+                comunidade: 'Comunidade A',
+                hEvisceramento: '10:00',
+                ativo: 1
+            },
+            {
+                id: 2,
+                especie: 'Dourado',
+                lacre: 'XYZ789',
+                cat: 'B',
+                sexo: 'F',
+                unidade: 'Kg',
+                gona: 'G2',
+                comprimento: '55 cm',
+                peso: '2 Kg',
+                hPesca: '09:00',
+                lago: 'Lago Verde',
+                comunidade: 'Comunidade B',
+                hEvisceramento: '11:00',
+                ativo: 1
+            },
+            {
+                id: 3,
+                especie: 'Tilápia',
+                lacre: 'DEF456',
+                cat: 'C',
+                sexo: 'M',
+                unidade: 'Kg',
+                gona: 'G3',
+                comprimento: '30 cm',
+                peso: '1 Kg',
+                hPesca: '07:30',
+                lago: 'Lago Vermelho',
+                comunidade: 'Comunidade C',
+                hEvisceramento: '09:30',
+                ativo: 1
+            }
+        ];
+
+        // Gerar as linhas da tabela dinamicamente
+        const tableRows = peixesMock.map(peixe => `
+            <tr>
+                <td>${peixe.especie}</td>
+                <td>${peixe.lacre}</td>
+                <td>1</td>
+                <td>${peixe.cat}</td>
+                <td>${peixe.comprimento}</td>
+                <td>${peixe.peso}</td>
+                <td>${peixe.sexo}</td>
+                <td>${peixe.gona}</td>
+            </tr>
+        `).join('');
+
+        // Inserir as linhas no corpo da tabela
+        document.getElementById('table-body').innerHTML = tableRows;
+    </script>
+</body>
+
+</html>

@@ -28,7 +28,7 @@ const db = drizzle(expoDB);
 
 export default function App() {
   const { success, error } = useMigrations(db, migrations);
-  
+
   if (error) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -44,15 +44,21 @@ export default function App() {
   return (
     <SQLiteProvider databaseName={DATABASE_NAME}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} options={{headerShown: false}}/>
+        <Stack.Navigator
+          initialRouteName="Home"
+          screenOptions={{
+            
+            contentStyle: { backgroundColor: 'white' } // Fundo branco para o conteúdo
+          }}
+        >
+          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Details" component={DetailsScreen} />
           <Stack.Screen name='RegistrarPeixe' component={RegistrarPeixe} /* options={{headerShown: false}} */ />
           <Stack.Screen name="Teste" component={Teste} />
-          <Stack.Screen name="PeixesRegistrados" component={PeixesRegistrados}/>
-          <Stack.Screen name="Pescas" component={PescasScreen}/>
-          <Stack.Screen name="GuiaDeTransporte" component={GuiaDeTransporte}/>
-          <Stack.Screen name="GuiaDeConfirmacao" component={GuiaDeConfirmacao}/>
+          <Stack.Screen name="PeixesRegistrados" component={PeixesRegistrados} />
+          <Stack.Screen name="Pescas" component={PescasScreen} />
+          <Stack.Screen name="GuiaDeTransporte" component={GuiaDeTransporte} />
+          <Stack.Screen name="GuiaDeConfirmacao" component={GuiaDeConfirmacao} />
         </Stack.Navigator>
       </NavigationContainer>
     </SQLiteProvider>

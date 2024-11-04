@@ -58,8 +58,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff',
     },
     pickerItem: {
-        color: '#BBBBBB',
-        fontSize: 14
+        color: '#2C205E', // Cor mais escura e forte
+        fontSize: 14,
+        fontWeight: 'bold', // Negrito para dar mais ênfase
     },
     errorText: {
         color: 'red',

@@ -1,4 +1,3 @@
-import { boolean } from "drizzle-orm/mysql-core";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // Define a tabela "peixes" com base na interface IPeixe
@@ -16,4 +15,6 @@ export const peixe = sqliteTable("peixes", {
   lago: text("lago").notNull(),                   // Campo "lago" como texto não nulo
   comunidade: text("comunidade").notNull(),       // Campo "comunidade" como texto não nulo
   hEvisceramento: text("hEvisceramento").notNull(), // Campo "hEvisceramento" como texto não nulo
+  ativo: integer("ativo").notNull().default(1),    // Campo "ativo" como inteiro: 0 para falso, 1 para verdadeiro
 });
+

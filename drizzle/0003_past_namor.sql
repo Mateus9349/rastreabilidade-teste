@@ -1,0 +1,1 @@
+ALTER TABLE `lotes` ADD `ativo` integer DEFAULT 1 NOT NULL;

@@ -1,11 +1,9 @@
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
-import { Button, Text, TouchableOpacity, View } from "react-native";
+import { Button, ScrollView, Text, View } from "react-native";
 import * as loteSchema from '../database/schemas/loteSchema';
 import SelectLoteConfirmacao from "../components/SelectLoteConfirmacao";
-import * as peixeSchema from "../database/schemas/peixeSchema";
-import { IPeixe } from "../types/Peixe";
 import CardListaConfirma from "../components/CardListaConfirma";
 
 interface Lote {
@@ -27,20 +25,17 @@ interface Lote {
 
 export default function GuiaDeConfirmacao() {
     const [lotes, setLotes] = useState<Lote[]>([]);
-    const [peixes, setPeixes] = useState<IPeixe[]>([]);
     const [click, setClick] = useState<boolean>(true);
-    const [peixesSelected, setPeixesSelected] = useState<IPeixe[]>([]);
+    const [loteSelected, setLoteSelected] = useState<any>(undefined);
 
     const database = useSQLiteContext();
     const db = drizzle(database, { schema: loteSchema });
-    const dbPeixes = drizzle(database, { schema: peixeSchema });
 
     async function fetchLotes() {
         try {
             const response = await db.query.lote.findMany();
-            const responsePeixes = await dbPeixes.query.peixe.findMany();
-            setLotes(response);
-            setPeixes(responsePeixes);
+            const lotesEnviados = response.filter(lote => lote.ativo === 0);
+            setLotes(lotesEnviados);
         } catch (error) {
             console.log(error);
         }
@@ -52,26 +47,38 @@ export default function GuiaDeConfirmacao() {
 
     const selectLote = (lote: Lote) => {
         setClick(false);
-        const peixesDoLote: IPeixe[] = peixes.filter((peixe) => lote.peixes.includes(peixe.lacre));
-        setPeixesSelected(peixesDoLote);
+        setLoteSelected(lote);
     }
 
     return (
         <>
-            <Text>Escolha o lote para confirmar: </Text>
-
             {click ?
-                <SelectLoteConfirmacao
-                    lotes={lotes}
-                    selectLote={selectLote}
-                />
+                <>
+                    <Text style={{ color: '#2C205E', fontSize: 25, fontWeight: 'bold', marginTop: 20, textAlign: 'center' }}>
+                        Escolha o lote enviado para confirmar:
+                    </Text>
+                    <SelectLoteConfirmacao
+                        lotes={lotes}
+                        selectLote={selectLote}
+                    />
+                </>
                 :
-                <View>
-                    <CardListaConfirma peixes={peixesSelected}/>
-                    <Button title="voltar" onPress={() => setClick(true)} />
-                </View>
-            }
+                <ScrollView>
+                    <View style={{ width: '90%', marginHorizontal: 'auto', marginVertical: 32 }}>
+                        <Text style={{ color: '#2C205E', fontWeight: 'bold', fontSize: 24 }}>
+                            Guias de Confirmação
+                        </Text>
 
+                        <Text style={{ color: '#4B465E', fontSize: 16 }}>
+                            Confirme as informações de pescado como lacre e peso.
+                        </Text>
+                    </View>
+
+                    <CardListaConfirma
+                        lote={loteSelected}
+                    />
+                </ScrollView>
+            }
         </>
     )
 }

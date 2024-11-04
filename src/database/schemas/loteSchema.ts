@@ -16,4 +16,5 @@ export const lote = sqliteTable("lotes", {
   quantidadeM: integer("quantidadeM").notNull(), // Campo "quantidadeM" como número não nulo
   pesoTotal: text("pesoTotal").notNull(), // Campo "pesoTotal" como texto não nulo
   peixes: text("peixes").notNull(), // Campo "peixes" como texto não nulo para armazenar IDs ou lacres dos peixes
+  ativo: integer("ativo").notNull().default(1),    // Campo "ativo" como inteiro: 0 para falso, 1 para verdadeiro
 });

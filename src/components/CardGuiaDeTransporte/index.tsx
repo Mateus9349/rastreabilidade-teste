@@ -1,6 +1,62 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from "react-native";
+import { gerarEPDFDownloadExpo } from "../../types/ts/gerarPDFGuiaDeTransporte";
+import { useSQLiteContext } from "expo-sqlite";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import * as peixeSchema from '../../database/schemas/peixeSchema';
+import * as loteSchema from '../../database/schemas/loteSchema';
+import { useEffect, useState } from "react";
+import { eq } from "drizzle-orm";
 
 export default function CardGuiaDeTransporte({ lotes, remove }: { lotes: Object[] | undefined; remove: (id: number) => void }) {
+
+    const database = useSQLiteContext();
+    const db = drizzle(database, { schema: peixeSchema });
+
+    useEffect(() => {
+
+    }, [lotes]);
+
+    async function fetchPeixesDoLote(lote: ILote) {
+        try {
+            // Buscar todos os peixes do banco de dados
+            const todosPeixes = await db.query.peixe.findMany();
+
+            // Filtrar peixes que pertencem ao lote
+            const peixesFiltrados = todosPeixes.filter(peixe =>
+                lote.peixes.includes(peixe.lacre.toString())
+            );
+
+            await gerarEPDFDownloadExpo({ peixes: peixesFiltrados, lote });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const enviaBarco = async (lote: ILote) => {
+        try {
+            await desativaLote(lote.id);
+            Alert.alert('Banco de dados em nuvem ainda não estão ativos!');
+        } catch (error) {
+            Alert.alert('Error ao enviar barco: ' + error);
+        }
+    }
+
+    const desativaLote = async (id: number | undefined) => {
+        if (id === undefined || id === 0) {
+            // Exibir uma mensagem de erro ou não fazer nada
+            Alert.alert("Erro", "ID inválido.");
+            return;
+        }
+
+        try {
+            await db.update(loteSchema.lote).set({ ativo: 0 }).where(eq(loteSchema.lote.id, id));
+        } catch (error) {
+            Alert.alert("Error ao atualizar o lote no banco interno: " + error);
+        }
+    }
+
+
+
     return (
         <ScrollView
             contentContainerStyle={{ alignItems: 'center', marginTop: 15, marginBottom: 15 }}
@@ -25,14 +81,17 @@ export default function CardGuiaDeTransporte({ lotes, remove }: { lotes: Object[
                     <View style={styles.btnContainer}>
                         <TouchableOpacity
                             style={styles.btn1}
-                            onPress={() => Alert.alert('Banco de dados em nuvem ainda não estão ativos!')}
+                            onPress={() => enviaBarco(lote)}
                             onLongPress={() => remove(lote.id)}
                         >
-                            <Image source={require('../../../assets/icons/Enviar.png')} />
+                            <Image source={require('../../../assets/icons/enviarBarco.png')} />
                             <Text style={styles.btnText1}>Enviar</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.btn2}>
+                        <TouchableOpacity
+                            style={styles.btn2}
+                            onPress={() => fetchPeixesDoLote(lote)}
+                        >
                             <Image source={require('../../../assets/icons/download.png')} />
                             <Text style={styles.btnText2}>Baixar Guia</Text>
                         </TouchableOpacity>

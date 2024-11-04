@@ -30,7 +30,7 @@ export default function FormLote({ peixes, post }: { peixes: IPeixe[]; post: (lo
 
     const handleIntervaloDeLacres = (inicio: number, fim: number) => {
         const peixesFiltrados = peixes.filter(peixe => {
-            const lacreNumber = Number(peixe.lacre); // Converte o lacre para number
+            const lacreNumber = peixe.ativo === 1 ?  Number(peixe.lacre): -1; // Converte o lacre para number
             return lacreNumber >= inicio && lacreNumber <= fim;
         });
 

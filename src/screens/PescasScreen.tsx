@@ -15,14 +15,14 @@ export default function PescasScreen({ navigation }: Props) {
                 <BotaoPescas
                     title="Cadastrar Nova Pesca"
                     text="Cadastre novas pescas no aplicativo"
-                    src={require('../../assets/icons/Mais.png')}
+                    src={require('../../assets/icons/mais.png')}
                     OnPress={() => navigation.navigate('RegistrarPeixe')}
                 />
 
                 <BotaoPescas
                     title="Pescas Atuais"
                     text="Visualize ou edite as pescas atuais"
-                    src={require('../../assets/icons/Anzol.png')}
+                    src={require('../../assets/icons/anzol.png')}
                     OnPress={() => navigation.navigate('PeixesRegistrados')}
                 />
             </View>
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     title: {
-        color: '#000000',
+        color: '#2C205E',
         fontFamily: 'Inter',
         fontSize: 19,
         fontStyle: 'normal',
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         marginBottom: 6
     },
     text: {
-        color: '#000000',
+        color: '#4B465E',
         fontFamily: 'Inter',
         fontSize: 16,
         fontStyle: 'normal',

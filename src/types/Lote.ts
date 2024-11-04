@@ -1,4 +1,5 @@
 interface ILote {
+    id?: number;
     planilha: number;
     comunidade: string;
     setor: string;
@@ -12,4 +13,5 @@ interface ILote {
     quantidadeM: number;
     pesoTotal: number;
     peixes: string[];
+    ativo?: number;
 }

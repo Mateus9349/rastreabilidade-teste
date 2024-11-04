@@ -27,11 +27,13 @@ export default function PeixesRegistrados({ navigation }: Props) {
     async function fetchPeixes() {
         try {
             const response = await db.query.peixe.findMany();
-            setPeixes(response);
+            const peixesAtivos = response.filter(item => item.ativo === 1); // Filtra apenas peixes ativos
+            setPeixes(peixesAtivos); // Define apenas peixes ativos no estado
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     }
+
 
     async function editarPeixe(peixe: IPeixe, id: number | undefined) {
         if (id === undefined || id === 0) {
@@ -102,7 +104,7 @@ export default function PeixesRegistrados({ navigation }: Props) {
 
     useEffect(() => {
         fetchPeixes()
-    }, []);
+    }, [finalizar]);
 
     const dbLote = drizzle(database, { schema: loteSchema });
 
@@ -132,14 +134,24 @@ export default function PeixesRegistrados({ navigation }: Props) {
         };
 
         try {
+            for (const peixe of peixes) {
+                if (dados.peixes.includes(peixe.lacre)) {
+                    await db
+                        .update(peixeSchema.peixe)
+                        .set({ ativo: 0 })
+                        .where(eq(peixeSchema.peixe.id, Number(peixe.id)));
+                }
+            }
+
             // Aqui você deve usar myLoteData em vez de dados
             const response = await dbLote.insert(loteSchema.lote).values(myLoteData);
             Alert.alert("Cadastrado com o ID: " + response.lastInsertRowId);
             setFinalizar(false);
         } catch (error) {
-            console.error("Erro ao cadastrar o lote:", error); // Corrigido "peixe" para "lote"
-            Alert.alert("Erro", "Não foi possível cadastrar o lote. Tente novamente.");
+            console.error("Erro ao processar peixes ou cadastrar o lote:", error);
+            Alert.alert("Erro", "Não foi possível concluir o processo. Tente novamente.");
         }
+
     };
 
 
@@ -192,7 +204,7 @@ export default function PeixesRegistrados({ navigation }: Props) {
                 />
 
                 <TouchableOpacity style={style.btn} onPress={() => setFinalizar(true)}>
-                    <Text style={style.btnText}>Finalizar</Text>
+                    <Text style={style.btnText}>Preparar lote</Text>
                 </TouchableOpacity>
             </View>
             :
