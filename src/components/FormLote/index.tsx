@@ -2,9 +2,10 @@ import { Alert, Button, ScrollView, StyleSheet, View } from "react-native";
 import InputText from "../InputText";
 import { useEffect, useState } from "react";
 import DateInput from "../DataInput";
-import { IPeixe } from "../../types/Peixe";
+import { IPeixe } from "../../interfaces/Peixe";
 import SelecionaPeixes from "../SelecionaPeixes";
 import Botao from "../Botao";
+import { ILote } from "../../interfaces/Lote";
 
 export default function FormLote({ peixes, post }: { peixes: IPeixe[]; post: (lote: ILote) => void; }) {
     const [click, setClick] = useState<boolean>(true);
@@ -21,7 +22,7 @@ export default function FormLote({ peixes, post }: { peixes: IPeixe[]; post: (lo
         quantidadeF: 0,
         quantidadeM: 0,
         pesoTotal: 0,
-        peixes: []
+        peixes: [],
     });
 
     const handleChange = (field: keyof ILote, value: string | number | Date | string[]) => {

@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { View, Image, StyleSheet, Alert, TouchableWithoutFeedback } from "react-native";
 import { RootStackParamList } from "../navigation/types";
 import FormPeixe from "../components/FormPeixe";
-import { IPeixe } from "../types/Peixe";
+import { IPeixe } from "../interfaces/Peixe";
 
 import { useSQLiteContext } from "expo-sqlite";
 import { drizzle } from "drizzle-orm/expo-sqlite";

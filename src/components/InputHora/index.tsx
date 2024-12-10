@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
-import { IPeixe } from "../../types/Peixe";
+import { IPeixe } from "../../interfaces/Peixe";
 
 interface InputHoraProps {
     dados: IPeixe;

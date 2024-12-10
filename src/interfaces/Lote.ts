@@ -1,4 +1,4 @@
-interface ILote {
+export interface ILote {
     id?: number;
     planilha: number;
     comunidade: string;
@@ -14,4 +14,5 @@ interface ILote {
     pesoTotal: number;
     peixes: string[];
     ativo?: number;
+    recebidoSalgadeira?: boolean;
 }

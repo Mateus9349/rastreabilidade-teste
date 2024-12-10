@@ -1,41 +1,77 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert } from "react-native";
-import { gerarEPDFDownloadExpo } from "../../types/ts/gerarPDFGuiaDeTransporte";
+import { gerarEPDFDownloadExpo } from "../../utils/gerarPDFGuiaDeTransporte";
 import { useSQLiteContext } from "expo-sqlite";
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import * as peixeSchema from '../../database/schemas/peixeSchema';
 import * as loteSchema from '../../database/schemas/loteSchema';
 import { useEffect, useState } from "react";
 import { eq } from "drizzle-orm";
+import { ILote } from "../../interfaces/Lote";
+import { useCriarLote } from "../../hooks/lote/useCriarLote";
+import { IPeixe } from "../../interfaces/Peixe";
+import { useCriarPeixe } from "../../hooks/peixe/useCriarPeixe";
 
 export default function CardGuiaDeTransporte({ lotes, remove }: { lotes: Object[] | undefined; remove: (id: number) => void }) {
+    const { criarLote, loading, error } = useCriarLote();
+    const { criarPeixe } = useCriarPeixe();
 
     const database = useSQLiteContext();
     const db = drizzle(database, { schema: peixeSchema });
 
     useEffect(() => {
-
+        
     }, [lotes]);
 
-    async function fetchPeixesDoLote(lote: ILote) {
+    async function getPeixesDoLote(lote: ILote) {
         try {
             // Buscar todos os peixes do banco de dados
             const todosPeixes = await db.query.peixe.findMany();
-
+    
+            // Garantir que lote.peixes é um array de lacres
+            const lotePeixes = typeof lote.peixes === 'string' 
+                ? JSON.parse(lote.peixes) 
+                : lote.peixes;
+    
             // Filtrar peixes que pertencem ao lote
             const peixesFiltrados = todosPeixes.filter(peixe =>
-                lote.peixes.includes(peixe.lacre.toString())
+                lotePeixes.includes(peixe.lacre.toString())
             );
-
-            await gerarEPDFDownloadExpo({ peixes: peixesFiltrados, lote });
+    
+            return peixesFiltrados;
         } catch (error) {
-            console.log(error);
+            console.error("Erro ao buscar peixes do lote:", error);
+            throw error; // Re-throw para que o erro seja capturado na função fetchPeixesDoLote
         }
     }
+    
+    async function fetchPeixesDoLote(lote: ILote) {
+        try {
+            const peixesFiltrados = await getPeixesDoLote(lote);
+            await gerarEPDFDownloadExpo({ peixes: peixesFiltrados, lote });
+        } catch (error) {
+            console.error("Erro ao gerar o PDF:", error);
+        }
+    }
+    
 
     const enviaBarco = async (lote: ILote) => {
         try {
+            // Verifica se `lote.peixes` é uma string e a converte para um array
+            /* const peixes = typeof lote.peixes === 'string'
+                ? JSON.parse(lote.peixes).map(Number)
+                : [];
+
+            const peixesNoLote = await getPeixesDoLote(lote);
+            for (const peixe of peixesNoLote) {
+                await criarPeixe(peixe);
+            } */
+
+
+
+            //await criarLote(lote);
             await desativaLote(lote.id);
-            Alert.alert('Banco de dados em nuvem ainda não estão ativos!');
+            //adicionar situação do lote como enviado para salgadeira ou não confirmado na salgadeira
+            Alert.alert('Informações enviadas a salgadeira!');
         } catch (error) {
             Alert.alert('Error ao enviar barco: ' + error);
         }

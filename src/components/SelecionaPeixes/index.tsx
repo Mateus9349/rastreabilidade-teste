@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import InputText from "../InputText";
 import { useEffect, useState } from "react";
-import { IPeixe } from "../../types/Peixe";
+import { IPeixe } from "../../interfaces/Peixe";
 
 interface Props {
     peixes: IPeixe[];

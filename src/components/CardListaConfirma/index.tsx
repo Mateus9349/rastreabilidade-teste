@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Pressable, Alert, ScrollView } from 'react-native';
 import { CheckBox } from 'react-native-elements';
-import { IPeixe } from "../../types/Peixe";
+import { IPeixe } from "../../interfaces/Peixe";
 import FormPeixe from '../FormPeixe';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as peixeSchema from '../../database/schemas/peixeSchema';
 import * as loteSchema from '../../database/schemas/loteSchema';
 import { eq } from 'drizzle-orm';
+import { ILote } from '../../interfaces/Lote';
 
 interface Props {
     lote: ILote | undefined;

@@ -3,6 +3,7 @@
     "name": "rastreabilidade-teste",
     "slug": "rastreabilidade-teste",
     "version": "1.0.0",
+    "sdkVersion": "51.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -12,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mateus9349.rastreabilidadeteste"
     },
     "android": {
       "adaptiveIcon": {

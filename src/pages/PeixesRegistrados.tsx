@@ -1,7 +1,7 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/types";
 import { useEffect, useState } from "react";
-import { IPeixe } from "../types/Peixe";
+import { IPeixe } from "../interfaces/Peixe";
 import { Alert, Button, FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import FormPeixe from "../components/FormPeixe";
 
@@ -12,6 +12,7 @@ import * as peixeSchema from '../database/schemas/peixeSchema';
 import { eq } from "drizzle-orm";
 import FormLote from "../components/FormLote";
 import * as loteSchema from "../database/schemas/loteSchema";
+import { ILote } from "../interfaces/Lote";
 
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PeixesRegistrados'>;

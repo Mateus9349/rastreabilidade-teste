@@ -2,7 +2,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
-import { IPeixe } from '../Peixe';
+import { IPeixe } from '../interfaces/Peixe';
 
 interface Props {
     peixes: IPeixe[];

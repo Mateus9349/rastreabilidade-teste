@@ -7,5 +7,6 @@ export type RootStackParamList = {
     Pescas: undefined;
     GuiaDeTransporte: undefined;
     GuiaDeConfirmacao: undefined;
+    Login: undefined;
 };
   

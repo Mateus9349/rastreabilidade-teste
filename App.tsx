@@ -1,23 +1,24 @@
-import { drizzle } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync, SQLiteProvider } from "expo-sqlite";
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
-import migrations from './drizzle/migrations';
-
-
-import React from 'react';
+import { useContext } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from './src/navigation/types';
 
-import HomeScreen from './src/screens/HomeScreen';
-import DetailsScreen from './src/screens/DetailsScreen';
-import RegistrarPeixe from './src/screens/RegistrarPeixe';
-import Teste from "./src/screens/TesteScreen";
-import PeixesRegistrados from "./src/screens/PeixesRegistrados";
-import PescasScreen from "./src/screens/PescasScreen";
-import GuiaDeTransporte from "./src/screens/GuiaDeTransporte";
-import GuiaDeConfirmacao from "./src/screens/GuiaDeConfirmacao";
+import { AuthContext, AuthProvider } from "./src/contexts/AuthContext";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+import { openDatabaseSync, SQLiteProvider } from "expo-sqlite";
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import migrations from './drizzle/migrations';
+
+import HomeScreen from './src/pages/HomeScreen';
+import DetailsScreen from './src/pages/DetailsScreen';
+import RegistrarPeixe from './src/pages/RegistrarPeixe';
+import Teste from "./src/pages/TesteScreen";
+import PeixesRegistrados from "./src/pages/PeixesRegistrados";
+import PescasScreen from "./src/pages/PescasScreen";
+import GuiaDeTransporte from "./src/pages/GuiaDeTransporte";
+import GuiaDeConfirmacao from "./src/pages/GuiaDeConfirmacao";
+import LoginScreen from "./src/pages/LoginScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -42,26 +43,49 @@ export default function App() {
   }
 
   return (
-    <SQLiteProvider databaseName={DATABASE_NAME}>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Home"
-          screenOptions={{
-            
-            contentStyle: { backgroundColor: 'white' } // Fundo branco para o conteúdo
-          }}
-        >
+    <AuthProvider>
+      <SQLiteProvider databaseName={DATABASE_NAME}>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </SQLiteProvider>
+    </AuthProvider>
+  );
+}
+
+function AppNavigator() {
+  const { isAuthenticated, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack.Navigator
+      initialRouteName={isAuthenticated ? "Home" : "Login"}
+      screenOptions={{
+        contentStyle: { backgroundColor: 'white' }
+      }}
+    >
+      {isAuthenticated ? (
+        <>
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Details" component={DetailsScreen} />
-          <Stack.Screen name='RegistrarPeixe' component={RegistrarPeixe} /* options={{headerShown: false}} */ />
+          <Stack.Screen name="RegistrarPeixe" component={RegistrarPeixe} />
           <Stack.Screen name="Teste" component={Teste} />
           <Stack.Screen name="PeixesRegistrados" component={PeixesRegistrados} />
           <Stack.Screen name="Pescas" component={PescasScreen} />
           <Stack.Screen name="GuiaDeTransporte" component={GuiaDeTransporte} />
           <Stack.Screen name="GuiaDeConfirmacao" component={GuiaDeConfirmacao} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SQLiteProvider>
+        </>
+      ) : (
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+      )}
+    </Stack.Navigator>
   );
 }
 
