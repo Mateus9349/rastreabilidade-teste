@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     title: {
-        color: '#2C205E',
+        color: '#FFFFFF',
         fontFamily: 'Inter',
         fontSize: 19,
         fontStyle: 'normal',
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         marginBottom: 6
     },
     text: {
-        color: '#4B465E',
+        color: '#BFC6D6',
         fontFamily: 'Inter',
         fontSize: 16,
         fontStyle: 'normal',

@@ -29,6 +29,7 @@ export default function InputText({
                 keyboardType={keyboardType || 'default'}
                 pointerEvents={pointerEvents || 'auto'}
                 editable={pointerEvents !== 'none'}
+                placeholderTextColor="#BBBBBB"
             />
         </View>
     );
@@ -40,16 +41,16 @@ const styles = StyleSheet.create({
         minWidth: '50%'
     },
     title: {
-        color: '#2C205E',
+        color: '#EDF2FD',
         marginBottom: 4
     },
     input: {
         height: 54,
         borderWidth: 1,
         borderRadius: 7,
-        borderColor: "#D8D0F7",
+        borderColor: "#A4A4A4",
         paddingHorizontal: 16,
-        color: '#000'
+        color: '#FFFFFF'
     },
 });
 

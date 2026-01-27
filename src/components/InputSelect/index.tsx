@@ -43,24 +43,25 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     text: {
-        color: '#2C205E',
+        color: '#EDF2FD',
         fontFamily: 'Inter',
         marginBottom: 2
     },
     containerPicker: {
         borderWidth: 1,
-        borderColor: '#D8D0F7',
+        borderColor: '#A4A4A4',
         borderRadius: 5,
         overflow: 'hidden',
         marginBottom: 5,
     },
     picker: {
-        backgroundColor: '#ffffff',
+        color: '#BBBBBB',
     },
     pickerItem: {
-        color: '#2C205E', // Cor mais escura e forte
+        color: '#EDF2FD', // Cor mais escura e forte
         fontSize: 14,
         fontWeight: 'bold', // Negrito para dar mais ênfase
+        backgroundColor: '#1C1D1F'
     },
     errorText: {
         color: 'red',

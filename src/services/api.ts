@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://some-pots-beam.loca.lt/api/v1',
+  baseURL: 'https://api.gigantio.store/api/v1',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ const api = axios.create({
 });
 
 
-// Interceptor para log de requisições
+/* // Interceptor para log de requisições
 api.interceptors.request.use(
   request => {
     console.log("Iniciando requisição:", {
@@ -42,7 +42,7 @@ api.interceptors.response.use(
     console.error("Erro na resposta:", error.response || error.message);
     return Promise.reject(error);
   }
-);
+); */
 
 export default api;
 

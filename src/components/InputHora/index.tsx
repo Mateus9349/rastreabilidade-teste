@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     text: {
-        color: '#2C205E',
+        color: '#EDF2FD',
         fontFamily: 'Inter',
         marginBottom: 2
     },
@@ -59,12 +59,11 @@ const styles = StyleSheet.create({
         borderColor: '#D8D0F7',
         borderRadius: 5,
         padding: 10,
-        backgroundColor: '#ffffff',
         marginBottom: 5,
         width: '95%'
     },
     touchableText: {
-        color: '#2C205E',
+        color: '#BBBBBB',
         fontSize: 14,
     },
 });

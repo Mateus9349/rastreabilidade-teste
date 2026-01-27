@@ -1,7 +1,15 @@
-// src/pages/LoginScreen.tsx
 import React, { useState, useContext } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  TouchableOpacity
+} from 'react-native';
 import { AuthContext } from '../contexts/AuthContext';
+import Feather from '@expo/vector-icons/Feather';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -11,14 +19,20 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     setCarregando(true);
-    //const loginSuccess = await login(email, password);
-    const loginSuccess = await loginTeste();
+    const loginSuccess = await login(email, password);
+    //const loginSuccess = await loginTeste();
     setCarregando(false);
 
     if (!loginSuccess) {
       Alert.alert("Erro de Login", "Email ou senha incorretos. Tente novamente.");
     }
   };
+
+  const handleGuest = async () => {
+    setCarregando(true);
+    const loginSuccess = await loginTeste();
+    setCarregando(false);
+  }
 
   return (
     <View style={styles.container}>
@@ -30,6 +44,7 @@ export default function LoginScreen() {
         onChangeText={setEmail}
         autoCapitalize="none"
         keyboardType="email-address"
+        placeholderTextColor={'#F9F9F9'}
       />
       <TextInput
         style={styles.input}
@@ -38,33 +53,70 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         autoCapitalize="none"
         secureTextEntry
+        placeholderTextColor={'#F9F9F9'}
       />
-      <Button title="Entrar" onPress={handleLogin} disabled={carregando} />
+
+      <TouchableOpacity style={styles.btn} onPress={handleLogin} disabled={carregando}>
+        <Text style={styles.btnText}>Entrar</Text>
+      </TouchableOpacity>
       {carregando && <ActivityIndicator style={styles.loading} />}
+
+      <TouchableOpacity style={styles.btn2} onPress={handleGuest} disabled={carregando}>
+        <Feather name="user" size={34} color="white" />
+        <Text style={styles.btnText}>Entrar como convidado</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
-    backgroundColor: 'white'
+    gap: 10,
   },
   title: {
     fontSize: 24,
-    marginBottom: 16
+    marginBottom: 16,
+    color: '#D4A85B',
+    fontWeight: 200
   },
   input: {
     width: '100%',
     padding: 8,
     borderWidth: 1,
-    borderColor: 'gray',
-    marginBottom: 16
+    borderColor: '#D4A85B',
+    marginBottom: 16,
+    borderRadius: 15,
+    textAlign: 'center',
+    color: '#FFFFF',
+    fontSize: 12
   },
   loading: {
     marginTop: 16
+  },
+  btn: {
+    width: 200,
+    borderRadius: 10,
+    backgroundColor: '#871B21',
+    padding: 12
+  },
+  btn2: {
+    width: 200,
+    height: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: '#320d0fff',
+    padding: 8,
+    gap: 16,
+    position: 'relative',
+    top: 120
+  },
+  btnText: {
+    color: '#F9F9F9',
+    textAlign: 'center'
   }
 });

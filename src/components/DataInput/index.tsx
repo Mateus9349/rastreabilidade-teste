@@ -21,10 +21,10 @@ const DateInput: React.FC<DateInputProps> = ({ label, value, onChange }) => {
     };
 
     return (
-        <View>
-            <Text>{label}</Text>
+        <View style={{width: '95%', alignSelf: 'center', marginTop: 10}}>
+            <Text style={{ color: '#FFFFFF', marginBottom: 5 }}>{label}</Text>
             <TouchableOpacity style={styles.container} onPress={() => setShowDatePicker(true)}>
-                <Text>{value.toLocaleDateString('pt-BR')}</Text>
+                <Text style={{ color: '#FFFFFF' }}>{value.toLocaleDateString('pt-BR')}</Text>
             </TouchableOpacity>
 
             {showDatePicker && (
@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
         width: 'auto',
         minWidth: '50%',
         borderWidth: 1,
-        borderColor: '#BAB1DE',
+        borderColor: '#BBBBBB',
         borderRadius: 8,
         height: 44,
         marginBottom: 14

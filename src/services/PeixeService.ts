@@ -1,22 +1,7 @@
+// services/PeixeService.ts
 import api from './api';
-
-export interface IPeixe {
-  especie: string; // Espécie do peixe
-  cat: string; // Categoria do peixe
-  lacre: string; // Código único do lacre, padrão UUID
-  sexo: string; // Sexo do peixe
-  unidade: string; // Unidade de medida associada ao peixe
-  gona: string; // Estado da gonada
-  comprimento: string; // Comprimento do peixe
-  peso: string; // Peso do peixe
-  hPesca: string; // Horário da pesca
-  lago: string; // Nome do lago de origem
-  comunidade: string; // Nome da comunidade de origem
-  hEvisceramento: string; // Horário de evisceração do peixe
-  hChegadaSalgadeira: string; // Horário de chegada do peixe na salgadeira
-  createdBy: string; // Usuário que está cadastrando o peixe
-  status: "PENDING" | "CONFIRMED"; // Status do peixe ("PENDING" ou "CONFIRMED")
-}
+import { IPeixe } from '../interfaces/Peixe';
+import { IPeixeDTO } from '../interfaces/DTO/Peixe.DTO';
 
 export class PeixeService {
   static async buscarPeixes(): Promise<IPeixe[]> {
@@ -39,7 +24,8 @@ export class PeixeService {
     }
   }
 
-  static async criarPeixe(peixe: IPeixe): Promise<IPeixe> {
+  // cria UM peixe (segue disponível caso precise)
+  static async criarPeixe(peixe: IPeixeDTO): Promise<IPeixe> {
     try {
       const response = await api.post<IPeixe>('/fishes', peixe);
       return response.data;
@@ -54,6 +40,28 @@ export class PeixeService {
     }
   }
 
+  // cria VÁRIOS peixes de uma vez
+  static async criarPeixesBulk(peixes: IPeixeDTO[]): Promise<IPeixe[]> {
+    try {
+      // A maioria dos backends NestJS para batch espera um ARRAY puro no body:
+      // body: IPeixeDTO[]
+      const response = await api.post<IPeixe[]>('/fishes/batch', peixes);
+
+      // Se seu backend, por acaso, espera um wrapper (ex.: { createFishDto: IPeixeDTO[] }),
+      // troque a linha acima por:
+      // const response = await api.post<IPeixe[]>('/fishes/batch', { createFishDto: peixes });
+
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        console.error('Erro ao criar peixes (bulk) - Dados:', error.response.data);
+        console.error('Erro ao criar peixes (bulk) - Status:', error.response.status);
+      } else {
+        console.error('Erro na requisição (bulk):', error.message);
+      }
+      throw error;
+    }
+  }
 
   static async atualizarPeixe(id: number, peixe: IPeixe): Promise<IPeixe> {
     try {

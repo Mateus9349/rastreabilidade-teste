@@ -1,25 +1,29 @@
 import { TouchableOpacity, Text, StyleSheet, View, Image } from "react-native";
+import { IPeixe } from "../../interfaces/Peixe";
 
-interface Lote {
-    id: number;
-    ambiente: string;
-    apetrechos: string;
-    assistente: string;
-    barco: string;
-    comunidade: string;
-    data: string;
-    peixes: string;
-    pesoTotal: string;
-    planilha: number;
-    quantidade: number;
-    quantidadeF: number;
-    quantidadeM: number;
-    setor: string;
+interface ILote {
+    id?: string;
+    planilha: number; // Número da planilha associada ao lote
+    comunidade: string; // Nome da comunidade do lote
+    setor: string; // Setor relacionado ao lote
+    assistente: string; // Nome do assistente responsável pelo lote
+    barco: string; // Nome do barco usado para a pesca
+    data: string; // Data do lote no formato ISO 8601
+    apetrechos: string; // Tipo de apetrechos usados na pesca
+    ambiente: string; // Ambiente onde foi feito o lote
+    quantidade: number; // Quantidade total de peixes no lote
+    quantidadeF: number; // Quantidade de peixes fêmeas no lote
+    quantidadeM: number; // Quantidade de peixes machos no lote
+    pesoTotal: number; // Peso total do lote em kg
+    peixes: IPeixe[]; // IDs dos peixes pertencentes ao lote
+    ativo: number; // Status do lote (1 para ativo, 0 para inativo)
+    recebidoSalgadeira: boolean; // Indica se o lote foi recebido na salgadeira
+    createdBy: string; // Usuário que está cadastrando o lote  
 }
 
 interface Props {
-    lotes: Lote[];
-    selectLote: (lote: Lote) => void;
+    lotes: ILote[];
+    selectLote: (lote: ILote) => void;
 }
 
 export default function SelectLoteConfirmacao({ lotes, selectLote }: Props) {
@@ -63,30 +67,25 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: 'white',
     },
     card: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
-        backgroundColor: '#F1F5FF',
+        borderWidth: 0.5,
         borderRadius: 10,
+        borderColor: '#BBBBBB',
         padding: 15,
         marginVertical: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-        elevation: 3,
     },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 5,
-        color: '#2C205E',
+        color: '#EDF2FD',
     },
     text: {
-        color: '#4B465E',
+        color: '#BBBBBB',
         fontWeight: '400',
     },
     date: {

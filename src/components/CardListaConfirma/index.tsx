@@ -8,14 +8,33 @@ import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as peixeSchema from '../../database/schemas/peixeSchema';
 import * as loteSchema from '../../database/schemas/loteSchema';
 import { eq } from 'drizzle-orm';
-import { ILote } from '../../interfaces/Lote';
+
+interface ILote {
+    id?: string;
+    planilha: number; // Número da planilha associada ao lote
+    comunidade: string; // Nome da comunidade do lote
+    setor: string; // Setor relacionado ao lote
+    assistente: string; // Nome do assistente responsável pelo lote
+    barco: string; // Nome do barco usado para a pesca
+    data: string; // Data do lote no formato ISO 8601
+    apetrechos: string; // Tipo de apetrechos usados na pesca
+    ambiente: string; // Ambiente onde foi feito o lote
+    quantidade: number; // Quantidade total de peixes no lote
+    quantidadeF: number; // Quantidade de peixes fêmeas no lote
+    quantidadeM: number; // Quantidade de peixes machos no lote
+    pesoTotal: number; // Peso total do lote em kg
+    peixes: IPeixe[]; // IDs dos peixes pertencentes ao lote
+    ativo: number; // Status do lote (1 para ativo, 0 para inativo)
+    recebidoSalgadeira: boolean; // Indica se o lote foi recebido na salgadeira
+    createdBy: string; // Usuário que está cadastrando o lote  
+}
 
 interface Props {
     lote: ILote | undefined;
 }
 
 export default function CardListaConfirma({ lote }: Props) {
-    const [peixesNoLote, setPeixesNoLote] = useState<IPeixe[]>([]);
+    /* const [peixesNoLote, setPeixesNoLote] = useState<IPeixe[]>([]); */
     const [selectedPeixes, setSelectedPeixes] = useState<number[]>([]);
     const [editingPeixeId, setEditingPeixeId] = useState<number | null>(null);
 
@@ -23,7 +42,7 @@ export default function CardListaConfirma({ lote }: Props) {
     const db = drizzle(database, { schema: peixeSchema });
     const dbLote = drizzle(database, { schema: loteSchema });
 
-    useEffect(() => {
+    /* useEffect(() => {
         fetchPeixes();
     }, [editingPeixeId]);
 
@@ -39,7 +58,7 @@ export default function CardListaConfirma({ lote }: Props) {
                 console.log('Error ao carregar os peixes do Lote: ' + error);
             }
         }
-    }
+    } */
 
     async function editarPeixe(peixe: IPeixe, id: number | undefined) {
         if (id === undefined || id === 0) {
@@ -80,11 +99,10 @@ export default function CardListaConfirma({ lote }: Props) {
     };
 
     const handleConfirm = async () => {
-        console.log(lote, peixesNoLote);
         if (lote !== undefined) {
             try {
                 await dbLote.update(loteSchema.lote).set({ ativo: 2 }).where(eq(loteSchema.lote.id, Number(lote.id)));
-                Alert.alert("Confirmado na salgadeira!");
+                Alert.alert("Aguardando confirmação da salgadeira!");
             } catch (error) {
                 Alert.alert("Error ao atualizar o lote no banco interno: " + error);
             }
@@ -94,14 +112,15 @@ export default function CardListaConfirma({ lote }: Props) {
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
-                {peixesNoLote.map(peixe => (
+                {lote?.peixes.map(peixe => (
                     <View key={peixe.id} style={styles.itemContainer}>
                         <View style={styles.containerCheck}>
                             <View style={styles.containerCheck2}>
                                 <CheckBox
                                     checked={selectedPeixes.includes(peixe.id!)}
                                     onPress={() => togglePeixe(peixe.id!)}
-                                    containerStyle={styles.checkboxContainer}
+                                    checkedColor="#871B21"
+                                    uncheckedColor="#871B21"
                                 />
                                 <View>
                                     <Text style={styles.title}>#{peixe.lacre}</Text>
@@ -145,8 +164,8 @@ export default function CardListaConfirma({ lote }: Props) {
 
                 <TouchableOpacity
                     onPress={handleConfirm}
-                    disabled={selectedPeixes.length < peixesNoLote.length}
-                    style={[styles.confirmButton, selectedPeixes.length < peixesNoLote.length && styles.disabledButton]}
+                    disabled={selectedPeixes.length < (lote?.peixes?.length ?? 0)}
+                    style={[styles.confirmButton, selectedPeixes.length < (lote?.peixes?.length ?? 0) && styles.disabledButton]}
                 >
                     <Text style={styles.confirmButtonText}>Confirmar Seleção</Text>
                 </TouchableOpacity>
@@ -160,19 +179,14 @@ const styles = StyleSheet.create({
         padding: 15,
     },
     container: {
-        backgroundColor: '#fff',
         borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
     },
     itemContainer: {
         flexDirection: 'column',
-        backgroundColor: '#F1F5FF',
         padding: 10,
-        borderRadius: 8,
+        borderRadius: 15,
+        borderColor: '#EDF2FD',
+        borderWidth: 0.2,
         marginBottom: 15,
     },
     checkboxContainer: {
@@ -195,8 +209,8 @@ const styles = StyleSheet.create({
         paddingRight: 35
     },
     icon: {
-        width: 20,
-        height: 20,
+        width: 25,
+        height: 25,
         resizeMode: 'contain',
         marginRight: 10,
     },
@@ -217,7 +231,7 @@ const styles = StyleSheet.create({
     confirmButton: {
         marginTop: 20,
         padding: 12,
-        backgroundColor: '#007BFF',
+        backgroundColor: '#871B21',
         borderRadius: 5,
         alignItems: 'center',
     },
@@ -227,14 +241,14 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     disabledButton: {
-        backgroundColor: '#ccc',
+        backgroundColor: '#373737',
     },
     title: {
-        color: '#2C205E',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 14
     },
     text: {
-        color: '#4B465E'
+        color: '#BBBBBB'
     },
 });

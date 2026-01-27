@@ -8,5 +8,9 @@ export type RootStackParamList = {
     GuiaDeTransporte: undefined;
     GuiaDeConfirmacao: undefined;
     Login: undefined;
+    User: undefined;
+    PrepararLote: undefined;
+    Comunidades: undefined;
+    Lagos: undefined;
 };
   

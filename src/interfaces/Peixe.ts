@@ -14,4 +14,6 @@ export interface IPeixe {
   hEvisceramento: string;
   hChegadaSalgadeira?: string;
   ativo?: number;
+  createdBy?: string;
+  status?: string;
 }

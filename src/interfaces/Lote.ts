@@ -1,6 +1,7 @@
 export interface ILote {
     id?: number;
     planilha: number;
+    //a informação passada no campo comunidade será o destino do lote
     comunidade: string;
     setor: string;
     assistente: string;

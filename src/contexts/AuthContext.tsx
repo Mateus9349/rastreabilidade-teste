@@ -1,5 +1,3 @@
-// src/contexts/AuthContext.tsx
-
 import React, { createContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../services/api';
@@ -72,9 +70,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Dados simulados do usuário
       const user = {
         id: 1,
-        nome: "Fulano",
-        email: "fulano@email.com",
-        permissoes: ["user"],
+        nome: "Manejador",
+        email: "generic@email.com",
+        permissoes: ["USER"],
       };
 
       // Simula o login bem-sucedido

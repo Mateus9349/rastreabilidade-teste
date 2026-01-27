@@ -13,7 +13,7 @@ import { eq } from "drizzle-orm";
 import FormLote from "../components/FormLote";
 import * as loteSchema from "../database/schemas/loteSchema";
 import { ILote } from "../interfaces/Lote";
-
+import React from "react";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'PeixesRegistrados'>;
 
@@ -156,65 +156,69 @@ export default function PeixesRegistrados({ navigation }: Props) {
     };
 
 
-    return <>
-        {!finalizar ?
-            <View style={style.containerMain}>
-                <View style={style.containerTitle}>
-                    <Text style={style.title}>Pescas Atuais</Text>
+    return (
+        <>
+            {!finalizar ?
+                <View style={style.containerMain}>
+                    <View style={style.containerTitle}>
+                        <Text style={style.title}>Pescas Atuais</Text>
 
-                    <Text style={style.p}>Confirme as informações de pescado como lacre e peso</Text>
-                </View>
+                        <Text style={style.p}>Confirme as informações de pescado como lacre e peso</Text>
+                    </View>
 
-                <FlatList
-                    data={peixes}
-                    keyExtractor={(item) => String(item.id)}
-                    renderItem={({ item }) => (
-                        <View style={style.containerCards}>
-                            <View style={style.card}>
-                                <View style={style.containerTextCard}>
-                                    <Image source={require('../../assets/icons/peixe.png')} />
-                                    <View>
-                                        <Text style={style.lacre}>{item.lacre}</Text>
-                                        <Text style={style.text}>Número do lacre</Text>
+                    <View style={{maxHeight: '80%'}}>
+                        <FlatList
+                            data={peixes}
+                            keyExtractor={(item) => String(item.id)}
+                            renderItem={({ item }) => (
+                                <View style={style.containerCards}>
+                                    <View style={style.card}>
+                                        <View style={style.containerTextCard}>
+                                            <Image source={require('../../assets/icons/peixe.png')} />
+                                            <View>
+                                                <Text style={style.lacre}>{item.lacre}</Text>
+                                                <Text style={style.text}>Número do lacre</Text>
+                                            </View>
+                                        </View>
+
+                                        <Pressable
+                                            onLongPress={() => remove(item.id)}
+                                            onPress={() => {
+                                                if (item.id !== undefined) {
+                                                    setEditingPeixeId(editingPeixeId === item.id ? null : item.id);
+                                                }
+                                            }}
+                                        >
+
+                                            <Image source={require('../../assets/icons/editar.png')} />
+                                        </Pressable>
                                     </View>
+
+                                    {editingPeixeId === item.id && (
+                                        <FormPeixe
+                                            dadosIniciais={item}
+                                            onSubmit={(dadosEditados: IPeixe) => editarPeixe(dadosEditados, item.id)}
+                                        />
+                                    )}
                                 </View>
-
-                                <Pressable
-                                    onLongPress={() => remove(item.id)}
-                                    onPress={() => {
-                                        if (item.id !== undefined) {
-                                            setEditingPeixeId(editingPeixeId === item.id ? null : item.id);
-                                        }
-                                    }}
-                                >
-
-                                    <Image source={require('../../assets/icons/editar.png')} />
-                                </Pressable>
-                            </View>
-
-                            {editingPeixeId === item.id && (
-                                <FormPeixe
-                                    dadosIniciais={item}
-                                    onSubmit={(dadosEditados: IPeixe) => editarPeixe(dadosEditados, item.id)}
-                                />
                             )}
-                        </View>
-                    )}
-                    ListEmptyComponent={() => <Text>Lista vazia.</Text>}
-                    contentContainerStyle={{ gap: 16, margin: 0 }}
-                />
+                            ListEmptyComponent={() => <Text>Lista vazia.</Text>}
+                            contentContainerStyle={{ gap: 16, margin: 0 }}
+                        />
+                    </View>
 
-                <TouchableOpacity style={style.btn} onPress={() => setFinalizar(true)}>
-                    <Text style={style.btnText}>Preparar lote</Text>
-                </TouchableOpacity>
-            </View>
-            :
-            <FormLote
-                peixes={peixes}
-                post={registrarLote}
-            />
-        }
-    </>
+                    <TouchableOpacity style={style.btn} onPress={() => navigation.navigate('PrepararLote')}>
+                        <Text style={style.btnText}>Preparar lote</Text>
+                    </TouchableOpacity>
+                </View>
+                :
+                <FormLote
+                    peixes={peixes}
+                    post={registrarLote}
+                />
+            }
+        </>
+    )
 }
 
 const style = StyleSheet.create({
@@ -223,7 +227,6 @@ const style = StyleSheet.create({
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center', // Centraliza os itens horizontalmente
-        marginTop: 20
     },
 
     containerTitle: {
@@ -232,12 +235,12 @@ const style = StyleSheet.create({
         alignSelf: 'flex-start'
     },
     title: {
-        color: '#2C205E',
+        color: '#FFFFFF',
         fontSize: 24,
         fontWeight: 'bold'
     },
     p: {
-        color: '#4B465E',
+        color: '#BBBBBB',
         width: 280
     },
 
@@ -249,11 +252,12 @@ const style = StyleSheet.create({
         marginLeft: 9,
         marginRight: 8,
         padding: 16,
-        borderRadius: 7,
+        borderRadius: 15,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center', // Garante que o conteúdo interno esteja alinhado no centro
-        backgroundColor: '#F1F5FF'
+        alignItems: 'center',
+        borderWidth: 0.2,
+        borderColor: '#BBBBBB'
     },
     containerTextCard: {
         flex: 1,
@@ -262,23 +266,24 @@ const style = StyleSheet.create({
         gap: 10
     },
     lacre: {
-        color: '#2C205E',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 15
     },
     text: {
-        color: '#4B465E'
+        color: '#BBBBBB'
     },
 
     btn: {
         maxHeight: 48,
         marginBottom: 16,
-        backgroundColor: '#200393',
+        backgroundColor: '#871B21',
         width: '90%',
         borderRadius: 14,
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop: 8
     },
     btnText: {
         color: 'white',

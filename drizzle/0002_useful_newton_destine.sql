@@ -1,1 +1,0 @@
-ALTER TABLE `peixes` ADD `ativo` integer DEFAULT 1 NOT NULL;
