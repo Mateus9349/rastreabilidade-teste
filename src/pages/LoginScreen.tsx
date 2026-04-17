@@ -14,29 +14,28 @@ import Feather from '@expo/vector-icons/Feather';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, loginTeste } = useContext(AuthContext);
+  const { login, loginGuest } = useContext(AuthContext);
   const [carregando, setCarregando] = useState<boolean>(false);
 
-  const handleLogin = async () => {
+  const handleKeycloakLogin = async () => {
     setCarregando(true);
-    const loginSuccess = await login(email, password);
-    //const loginSuccess = await loginTeste();
+    const loginSuccess = await login(email.trim(), password);
     setCarregando(false);
 
     if (!loginSuccess) {
-      Alert.alert("Erro de Login", "Email ou senha incorretos. Tente novamente.");
+      Alert.alert("Erro de Login", "Não foi possível autenticar no Keycloak. Verifique usuário/senha e a configuração.");
     }
   };
 
   const handleGuest = async () => {
     setCarregando(true);
-    const loginSuccess = await loginTeste();
+    await loginGuest();
     setCarregando(false);
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Login Keycloak</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -56,8 +55,8 @@ export default function LoginScreen() {
         placeholderTextColor={'#F9F9F9'}
       />
 
-      <TouchableOpacity style={styles.btn} onPress={handleLogin} disabled={carregando}>
-        <Text style={styles.btnText}>Entrar</Text>
+      <TouchableOpacity style={styles.btn} onPress={handleKeycloakLogin} disabled={carregando}>
+        <Text style={styles.btnText}>Entrar com Keycloak</Text>
       </TouchableOpacity>
       {carregando && <ActivityIndicator style={styles.loading} />}
 

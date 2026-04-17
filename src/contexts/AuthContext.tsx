@@ -1,15 +1,28 @@
 import React, { createContext, useState, useEffect, ReactNode, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../services/api';
 import { IUser } from '../interfaces/User';
+import api from '../services/api';
+import { authenticateWithKeycloak, fetchKeycloakUserInfo } from '../services/keycloakService';
+
+const STORAGE_SESSION_KEY = '@myapp:session';
+
+type AuthType = 'authenticated' | 'guest';
+
+interface PersistedSession {
+  user: IUser;
+  authType: AuthType;
+  accessToken?: string;
+}
 
 interface AuthContextData {
   isAuthenticated: boolean;
+  isGuest: boolean;
   login: (email: string, senha: string) => Promise<boolean>;
   logout: () => Promise<void>;
   loading: boolean;
   user: IUser | null;
-  loginTeste: () => Promise<boolean>;
+  accessToken: string | null;
+  loginGuest: () => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -20,85 +33,109 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<IUser | null>(null);
+  const [authType, setAuthType] = useState<AuthType | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadUser = async () => {
+    const loadSession = async () => {
       setLoading(true);
       try {
-        const storedUser = await AsyncStorage.getItem('@myapp:user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
+        const storedSession = await AsyncStorage.getItem(STORAGE_SESSION_KEY);
+        if (!storedSession) return;
+
+        const parsedSession = JSON.parse(storedSession) as PersistedSession;
+        setUser(parsedSession.user);
+        setAuthType(parsedSession.authType);
+
+        if (parsedSession.accessToken) {
+          setAccessToken(parsedSession.accessToken);
+          api.defaults.headers.common.Authorization = `Bearer ${parsedSession.accessToken}`;
         }
       } catch (error) {
-        console.error("Erro ao carregar o usuário:", error);
+        console.error('Erro ao carregar sessão:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadUser();
+    loadSession();
   }, []);
+
+  const persistSession = async (session: PersistedSession) => {
+    setUser(session.user);
+    setAuthType(session.authType);
+    setAccessToken(session.accessToken ?? null);
+
+    if (session.accessToken) {
+      api.defaults.headers.common.Authorization = `Bearer ${session.accessToken}`;
+    } else {
+      delete api.defaults.headers.common.Authorization;
+    }
+
+    await AsyncStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(session));
+  };
 
   const login = async (email: string, senha: string): Promise<boolean> => {
     try {
-      const response = await api.post('/auth', { email, senha });
-      if (response.status !== 204) {
-        throw new Error("Falha na autenticação: status inesperado");
-      }
+      const tokenResponse = await authenticateWithKeycloak(email, senha);
+      const userInfo = await fetchKeycloakUserInfo(tokenResponse.access_token);
 
-      const usersResponse = await api.get<{ data: IUser[] }>('/users');
-      const userArray = usersResponse.data.data;
-
-      const userEncontrado = userArray.find((item) => item.email === email);
-      if (!userEncontrado) {
-        throw new Error("Usuário não encontrado após autenticação");
-      }
-
-      setUser(userEncontrado);
-      await AsyncStorage.setItem('@myapp:user', JSON.stringify(userEncontrado));
-
-      return true; // Sucesso no login
-    } catch (error) {
-      console.error("Erro ao autenticar:", error);
-      return false; // Falha no login
-    }
-  };
-
-  const loginTeste = async (): Promise<boolean> => {
-    try {
-      // Dados simulados do usuário
-      const user = {
-        id: 1,
-        nome: "Manejador",
-        email: "generic@email.com",
-        permissoes: ["USER"],
+      const keycloakRoles = userInfo.realm_access?.roles ?? [];
+      const usuarioAutenticado: IUser = {
+        id: Number.parseInt(userInfo.sub, 16) || Date.now(),
+        nome: userInfo.name ?? userInfo.preferred_username ?? userInfo.given_name ?? email,
+        email: userInfo.email ?? email,
+        permissoes: keycloakRoles.length > 0 ? keycloakRoles : ['USER'],
       };
 
-      // Simula o login bem-sucedido
-      setUser(user);
+      await persistSession({
+        user: usuarioAutenticado,
+        authType: 'authenticated',
+        accessToken: tokenResponse.access_token,
+      });
 
-      // Armazena o usuário localmente
-      await AsyncStorage.setItem('@myapp:user', JSON.stringify(user));
-
-      console.log("Usuário autenticado com sucesso:", user);
-      return true; // Login simulado com sucesso
-    } catch (error: any) {
-      console.error("Erro ao autenticar:", error.message || error);
-      return false; // Caso algo dê errado na simulação
+      return true;
+    } catch (error) {
+      console.error('Erro ao autenticar com Keycloak:', error);
+      return false;
     }
   };
 
+  const loginGuest = async (): Promise<boolean> => {
+    try {
+      const guestUser: IUser = {
+        id: 0,
+        nome: 'Convidado',
+        email: 'guest@local',
+        permissoes: ['GUEST'],
+      };
+
+      await persistSession({
+        user: guestUser,
+        authType: 'guest',
+      });
+
+      return true;
+    } catch (error: any) {
+      console.error('Erro ao entrar como convidado:', error.message || error);
+      return false;
+    }
+  };
 
   const logout = async () => {
     setUser(null);
-    await AsyncStorage.removeItem('@myapp:user');
+    setAuthType(null);
+    setAccessToken(null);
+    delete api.defaults.headers.common.Authorization;
+    await AsyncStorage.removeItem(STORAGE_SESSION_KEY);
   };
 
-  const isAuthenticated = useMemo(() => !!user, [user]);
+  const isAuthenticated = useMemo(() => !!user && authType === 'authenticated', [user, authType]);
+  const isGuest = useMemo(() => !!user && authType === 'guest', [user, authType]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, loading, user, loginTeste }}>
+    <AuthContext.Provider value={{ isAuthenticated, isGuest, login, logout, loading, user, accessToken, loginGuest }}>
       {children}
     </AuthContext.Provider>
   );
