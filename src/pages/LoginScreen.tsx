@@ -23,7 +23,7 @@ export default function LoginScreen() {
     setCarregando(false);
 
     if (!loginSuccess) {
-      Alert.alert("Erro de Login", "Não foi possível autenticar no Keycloak. Verifique usuário/senha e a configuração.");
+      Alert.alert("Erro de Login", "Não foi possível autenticar no Keycloak. Verifique usuário/senha e as variáveis EXPO_PUBLIC_KEYCLOAK_*.");
     }
   };
 

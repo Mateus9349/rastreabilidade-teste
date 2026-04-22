@@ -28,20 +28,48 @@ interface KeycloakConfig {
   clientSecret?: string;
 }
 
+const normalize = (value?: string | null): string => (value ?? '').trim();
+
+const getExtraConfig = (): Record<string, any> => {
+  const expoExtra = (Constants.expoConfig?.extra ?? {}) as Record<string, any>;
+  const manifestExtra = ((Constants as any).manifest?.extra ?? {}) as Record<string, any>;
+  const manifest2Extra = ((Constants as any).manifest2?.extra ?? {}) as Record<string, any>;
+
+  return { ...manifestExtra, ...manifest2Extra, ...expoExtra };
+};
+
 const getKeycloakConfig = (): KeycloakConfig => {
-  const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, any>;
+  const extra = getExtraConfig();
   const keycloak = (extra.keycloak ?? {}) as Record<string, string>;
 
-  const baseUrl = keycloak.baseUrl;
-  const realm = keycloak.realm;
-  const clientId = keycloak.clientId;
-  const clientSecret = keycloak.clientSecret;
+  const envBaseUrl = process.env.EXPO_PUBLIC_KEYCLOAK_BASE_URL;
+  const envRealm = process.env.EXPO_PUBLIC_KEYCLOAK_REALM;
+  const envClientId = process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_ID;
+  const envClientSecret = process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_SECRET;
 
-  if (!baseUrl || !realm || !clientId) {
-    throw new Error('Configuração do Keycloak incompleta. Defina expo.extra.keycloak no app.config.js');
+  const baseUrl = normalize(keycloak.baseUrl || envBaseUrl).replace(/\/$/, '');
+  const realm = normalize(keycloak.realm || envRealm);
+  const clientId = normalize(keycloak.clientId || envClientId);
+  const clientSecret = normalize(keycloak.clientSecret || envClientSecret);
+
+  const missing: string[] = [];
+  if (!baseUrl) missing.push('baseUrl');
+  if (!realm) missing.push('realm');
+  if (!clientId) missing.push('clientId');
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Configuração do Keycloak incompleta (${missing.join(', ')}). ` +
+      'Defina EXPO_PUBLIC_KEYCLOAK_BASE_URL, EXPO_PUBLIC_KEYCLOAK_REALM e EXPO_PUBLIC_KEYCLOAK_CLIENT_ID '
+    );
   }
 
-  return { baseUrl, realm, clientId, clientSecret };
+  return {
+    baseUrl,
+    realm,
+    clientId,
+    clientSecret: clientSecret || undefined,
+  };
 };
 
 const createTokenUrl = (config: KeycloakConfig) =>
