@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthContext } from "../contexts/AuthContext";
 import { RootStackParamList } from "../navigation/types";
 
-import HomeScreen from "../pages/HomeScreen";
+import Home from "../pages/Home/Home";
 import DetailsScreen from "../pages/DetailsScreen";
 import RegistrarPeixe from "../pages/RegistrarPeixe";
 import Teste from "../pages/TesteScreen";
@@ -41,7 +41,7 @@ export default function AppNavigator() {
     >
       {canAccessApp ? (
         <>
-          <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
           <Stack.Screen name="Pescas" component={PescasScreen} options={screenOptions} />
           <Stack.Screen name="RegistrarPeixe" component={RegistrarPeixe} options={screenOptions} />
           <Stack.Screen name="PeixesRegistrados" component={PeixesRegistrados} options={screenOptions} />
