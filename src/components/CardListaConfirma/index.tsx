@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Pressable, Alert, ScrollView } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { IPeixe } from "../../interfaces/Peixe";
-import FormPeixe from '../FormPeixe';
+import FormPeixe from '../../pages/Pescas/components/PeixeForm';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as peixeSchema from '../../database/schemas/peixeSchema';

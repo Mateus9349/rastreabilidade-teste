@@ -8,7 +8,7 @@ import { RootStackParamList } from "../navigation/types";
 
 import Home from "../pages/Home/Home";
 import DetailsScreen from "../pages/DetailsScreen";
-import RegistrarPeixe from "../pages/RegistrarPeixe";
+import RegistrarPeixe from "../pages/Pescas/components/RegistrarPeixe";
 import Teste from "../pages/TesteScreen";
 import PeixesRegistrados from "../pages/PeixesRegistrados";
 import PescasScreen from "../pages/Pescas/PescasScreen";

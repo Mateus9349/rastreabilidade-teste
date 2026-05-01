@@ -3,7 +3,7 @@ import { RootStackParamList } from "../navigation/types";
 import { useEffect, useState } from "react";
 import { IPeixe } from "../interfaces/Peixe";
 import { Alert, Button, FlatList, Image, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import FormPeixe from "../components/FormPeixe";
+import FormPeixe from "./Pescas/components/PeixeForm";
 
 
 import { useSQLiteContext } from "expo-sqlite";

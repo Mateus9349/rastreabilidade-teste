@@ -1,70 +1,108 @@
-import { Picker } from "@react-native-picker/picker";
-import { View, Text, StyleSheet } from "react-native";
-import { useState } from "react";
+import { useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { HelperText, Surface, useTheme } from 'react-native-paper';
+
+import AppText from '../../components/ui/AppText';
 
 interface Props {
     title: string;
-    value: string;  // valor passado deve ser uma string
+    value: string;
     handleValue: (value: string) => void;
     label: string[];
     errorMessage?: string;
 }
 
-export default function InputSelect({ title, value = "", handleValue, label, errorMessage }: Props) {
+export default function InputSelect({
+    title,
+    value = '',
+    handleValue,
+    label,
+    errorMessage,
+}: Props) {
+    const theme = useTheme();
     const [touched, setTouched] = useState(false);
 
+    const hasError = touched && value === '';
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>{title}</Text>
-            <View style={styles.containerPicker}>
+        <Surface style={styles.container} elevation={0}>
+            <AppText variant="labelLarge" style={styles.label}>
+                {title}
+            </AppText>
+
+            <Surface
+                elevation={0}
+                style={[
+                    styles.containerPicker,
+                    {
+                        borderColor: hasError
+                            ? theme.colors.error
+                            : theme.colors.outline,
+                        backgroundColor: theme.colors.surface,
+                    },
+                ]}
+            >
                 <Picker
-                    selectedValue={value || ""}  // garanta que o valor nunca seja undefined
-                    style={styles.picker}
-                    onValueChange={(itemValue) => {
+                    selectedValue={value || ''}
+                    style={[
+                        styles.picker,
+                        {
+                            color: value
+                                ? theme.colors.onSurface
+                                : theme.colors.onSurfaceVariant,
+                        },
+                    ]}
+                    dropdownIconColor={theme.colors.onSurfaceVariant}
+                    onValueChange={(itemValue: string) => {
                         handleValue(itemValue);
                         setTouched(true);
                     }}
                 >
-                    <Picker.Item label="Selecione uma opção" value="" />
-                    {label.map((item, index) => (
-                        <Picker.Item style={styles.pickerItem} key={index} label={item} value={item} />
+                    <Picker.Item
+                        label="Selecione uma opção"
+                        value=""
+                        color={theme.colors.onSurfaceVariant}
+                    />
+
+                    {label.map((item) => (
+                        <Picker.Item
+                            key={item}
+                            label={item}
+                            value={item}
+                            color={theme.colors.onSurface}
+                        />
                     ))}
                 </Picker>
-            </View>
-            {touched && value === "" && (
-                <Text style={styles.errorText}>{errorMessage || "Esse campo é obrigatório"}</Text>
-            )}
-        </View>
+            </Surface>
+
+            {hasError ? (
+                <HelperText type="error" visible>
+                    {errorMessage || 'Esse campo é obrigatório'}
+                </HelperText>
+            ) : null}
+        </Surface>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: 'transparent',
     },
-    text: {
-        color: '#EDF2FD',
-        fontFamily: 'Inter',
-        marginBottom: 2
+    label: {
+        marginBottom: 6,
+        fontWeight: '600',
     },
     containerPicker: {
+        minHeight: 48,
         borderWidth: 1,
-        borderColor: '#A4A4A4',
-        borderRadius: 5,
+        borderRadius: 12,
         overflow: 'hidden',
-        marginBottom: 5,
+        justifyContent: 'center',
     },
     picker: {
-        color: '#BBBBBB',
-    },
-    pickerItem: {
-        color: '#EDF2FD', // Cor mais escura e forte
+        minHeight: 48,
         fontSize: 14,
-        fontWeight: 'bold', // Negrito para dar mais ênfase
-        backgroundColor: '#1C1D1F'
-    },
-    errorText: {
-        color: 'red',
-        fontSize: 12,
     },
 });
