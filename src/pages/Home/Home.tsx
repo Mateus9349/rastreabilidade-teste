@@ -39,12 +39,12 @@ export default function Home({ navigation }: Props) {
         <Link style={styles.profileLink} to="/User">
           <Surface
             mode="elevated"
-            elevation={3}
+            elevation={2}
             style={[
               styles.profileButton,
               {
-                backgroundColor: theme.colors.primary,
-                borderColor: theme.colors.tertiary,
+                backgroundColor: theme.colors.surface,
+                borderColor: theme.colors.outline,
               },
             ]}
           >
@@ -55,11 +55,17 @@ export default function Home({ navigation }: Props) {
           </Surface>
         </Link>
 
-        <Text variant="headlineLarge" style={styles.title}>
+        <Text
+          variant="headlineLarge"
+          style={[styles.title, { color: theme.colors.primary }]}
+        >
           Olá, {user?.nome.trim().split(/\s+/)[0] || 'Usuário'}
         </Text>
 
-        <Text variant="bodyMedium" style={styles.subtitle}>
+        <Text
+          variant="bodyMedium"
+          style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
+        >
           Selecione uma opção para começar
         </Text>
 
@@ -74,14 +80,26 @@ export default function Home({ navigation }: Props) {
           onPress={() => navigation.navigate('Comunidades')}
           title="Comunidades"
           description="Cadastre novas comunidades e modifique as já cadastradas"
-          icon={<MaterialCommunityIcons name="home-group" size={28} color={theme.colors.onPrimary} />}
+          icon={
+            <MaterialCommunityIcons
+              name="home-group"
+              size={28}
+              color={theme.colors.onPrimary}
+            />
+          }
         />
 
         <HomeOptionCard
           onPress={() => navigation.navigate('Lagos')}
           title="Lagos"
           description="Cadastre novos lagos e modifique os já cadastrados"
-          icon={<FontAwesome5 name="water" size={24} color={theme.colors.onPrimary} />}
+          icon={
+            <FontAwesome5
+              name="water"
+              size={24}
+              color={theme.colors.onPrimary}
+            />
+          }
         />
 
         <HomeOptionCard
@@ -107,12 +125,13 @@ const styles = StyleSheet.create({
   },
   profileLink: {
     marginBottom: 24,
+    alignSelf: 'flex-start',
   },
   profileButton: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    borderWidth: 2,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -127,7 +146,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     marginBottom: 28,
-    opacity: 0.78,
   },
   loader: {
     flex: 1,

@@ -1,6 +1,6 @@
-import React from "react";
-import { StyleSheet, View, Image } from "react-native";
-import { Card, Text, TouchableRipple, useTheme } from "react-native-paper";
+import React from 'react';
+import { StyleSheet, View, Image } from 'react-native';
+import { Card, Text, TouchableRipple, useTheme } from 'react-native-paper';
 
 type HomeOptionCardProps = {
     title: string;
@@ -20,7 +20,16 @@ export default function HomeOptionCard({
     const theme = useTheme();
 
     return (
-        <Card mode="elevated" style={styles.card}>
+        <Card
+            mode="elevated"
+            style={[
+                styles.card,
+                {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.outline,
+                },
+            ]}
+        >
             <TouchableRipple onPress={onPress} borderless>
                 <View style={styles.row}>
                     <View
@@ -29,19 +38,31 @@ export default function HomeOptionCard({
                             { backgroundColor: theme.colors.primary },
                         ]}
                     >
-                        {image ? (
-                            <Image source={image} style={styles.image} />
-                        ) : (
-                            icon
-                        )}
+                        {image ? <Image source={image} style={styles.image} /> : icon}
                     </View>
 
                     <View style={styles.content}>
-                        <Text variant="titleMedium" style={styles.title}>
+                        <Text
+                            variant="titleMedium"
+                            style={[
+                                styles.title,
+                                {
+                                    color: theme.colors.primary, // 🔵 azul no título
+                                },
+                            ]}
+                        >
                             {title}
                         </Text>
 
-                        <Text variant="bodySmall" style={styles.description}>
+                        <Text
+                            variant="bodySmall"
+                            style={[
+                                styles.description,
+                                {
+                                    color: theme.colors.onSurfaceVariant, // cinza secundário
+                                },
+                            ]}
+                        >
                             {description}
                         </Text>
                     </View>
@@ -53,46 +74,40 @@ export default function HomeOptionCard({
 
 const styles = StyleSheet.create({
     card: {
-        width: "100%",
+        width: '100%',
         marginBottom: 14,
         borderRadius: 18,
-        overflow: "hidden",
+        borderWidth: 1,
+        overflow: 'hidden',
     },
-
     row: {
         minHeight: 82,
-        flexDirection: "row",
-        alignItems: "stretch",
+        flexDirection: 'row',
+        alignItems: 'stretch',
     },
-
     mediaContainer: {
         width: 72,
-        alignItems: "center",
-        justifyContent: "center",
+        alignItems: 'center',
+        justifyContent: 'center',
         borderTopLeftRadius: 18,
         borderBottomLeftRadius: 18,
     },
-
     image: {
         width: 34,
         height: 34,
-        resizeMode: "contain",
+        resizeMode: 'contain',
     },
-
     content: {
         flex: 1,
-        justifyContent: "center",
+        justifyContent: 'center',
         paddingVertical: 14,
         paddingHorizontal: 16,
     },
-
     title: {
-        fontWeight: "700",
+        fontWeight: '700',
         marginBottom: 2,
     },
-
     description: {
-        opacity: 0.72,
         lineHeight: 18,
     },
 });
