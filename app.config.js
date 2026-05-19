@@ -34,6 +34,12 @@ export default {
         experiments: {
           newArchEnabled: true
         }
+      },
+      keycloak: {
+        baseUrl: process.env.EXPO_PUBLIC_KEYCLOAK_BASE_URL || "",
+        realm: process.env.EXPO_PUBLIC_KEYCLOAK_REALM || "",
+        clientId: process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_ID || "",
+        clientSecret: process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_SECRET || ""
       }
     },
     plugins: [

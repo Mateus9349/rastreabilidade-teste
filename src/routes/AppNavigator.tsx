@@ -21,7 +21,8 @@ import Lagos from "../pages/Lagos";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
-  const { isAuthenticated, loading } = useContext(AuthContext);
+  const { isAuthenticated, isGuest, loading } = useContext(AuthContext);
+  const canAccessApp = isAuthenticated || isGuest;
 
   if (loading) {
     return (
@@ -33,12 +34,12 @@ export default function AppNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName={isAuthenticated ? "Home" : "Login"}
+      initialRouteName={canAccessApp ? "Home" : "Login"}
       screenOptions={{
         contentStyle: { backgroundColor: "#1C1D1F" },
       }}
     >
-      {isAuthenticated ? (
+      {canAccessApp ? (
         <>
           <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
           <Stack.Screen name="Pescas" component={PescasScreen} options={screenOptions} />
