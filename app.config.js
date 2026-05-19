@@ -7,54 +7,51 @@ export default {
     userInterfaceStyle: "light",
     icon: "./assets/icon.png",
 
-    splash: {
-      image: "./assets/splash.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff"
-    },
+    plugins: [
+      "expo-font",
+      "expo-sqlite",
+      [
+        "expo-splash-screen",
+        {
+          image: "./assets/splash.png",
+          resizeMode: "contain",
+          backgroundColor: "#001b45",
+          imageWidth: 200
+        }
+      ]
+    ],
 
-    assetBundlePatterns: ["**/*"],
+    android: {
+      package: "org.fasamazonia.gygas",
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#001b45"
+      }
+    },
 
     ios: {
       supportsTablet: true,
       bundleIdentifier: "org.fasamazonia.gygas"
     },
 
-    android: {
-      package: "org.fasamazonia.gygas",
-      adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#A11814"
-      }
-    },
-
     web: {
       favicon: "./assets/favicon.png"
+    },
+
+    experiments: {
+      newArchEnabled: true
     },
 
     extra: {
       eas: {
         projectId: "7c1d5edc-23c4-462a-ab49-6cf30f47a021"
       },
-
-      expoClient: {
-        experiments: {
-          newArchEnabled: true
-        }
-      },
-
       keycloak: {
         baseUrl: process.env.EXPO_PUBLIC_KEYCLOAK_BASE_URL || "",
         realm: process.env.EXPO_PUBLIC_KEYCLOAK_REALM || "",
         clientId: process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_ID || "",
         clientSecret: process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_SECRET || ""
       }
-    },
-
-    plugins: ["expo-font", "expo-sqlite"],
-
-    experiments: {
-      newArchEnabled: true
     }
   }
 };

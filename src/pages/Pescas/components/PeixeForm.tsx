@@ -50,7 +50,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
 
     const comprimentoHasError = hasDecimalBRRangeError(
         dados.comprimento,
-        0.5,
+        1.5,
         3,
     );
 
@@ -277,7 +277,7 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                                     }
                                     keyboardType="decimal-pad"
                                     error={comprimentoHasError}
-                                    helperText='O comprimento deve estar entre 0,5m e 3m.'
+                                    helperText='O comprimento deve estar entre 1,5m e 3m.'
                                 />
                             </Surface>
                         </Surface>
