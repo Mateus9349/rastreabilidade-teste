@@ -8,12 +8,16 @@ import {
 import { Surface, Text, useTheme } from 'react-native-paper';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { useState } from 'react';
+import { and, eq } from 'drizzle-orm';
+import { useMemo, useState } from 'react';
 
 import { RootStackParamList } from '../../../navigation/types';
 import { IPeixe } from '../../../interfaces/Peixe';
 
 import * as peixeSchema from '../../../database/schemas/peixeSchema';
+import * as comunidadeSchema from '../../../database/schemas/comunidadeSchema';
+import * as lagoSchema from '../../../database/schemas/lagoSchema';
+import { validarENormalizarPeixeFormulario } from '../../../utils/validarPeixeFormulario';
 
 import AppButton from '../../../components/ui/AppButton';
 import FormPeixe from './PeixeForm';
@@ -25,27 +29,78 @@ export default function RegistrarPeixe({ navigation }: Props) {
     const [pescaRegistrada, setPescaRegistrada] = useState<boolean>(false);
 
     const database = useSQLiteContext();
-    const db = drizzle(database, { schema: peixeSchema });
+    const db = useMemo(
+        () =>
+            drizzle(database, {
+                schema: {
+                    ...peixeSchema,
+                    ...comunidadeSchema,
+                    ...lagoSchema,
+                },
+            }),
+        [database],
+    );
 
-    const registrarPeixe = async (dados: IPeixe) => {
+    const registrarPeixe = async (dados: IPeixe): Promise<boolean> => {
+        console.info('[RegistrarPescado] Iniciando cadastro');
+
         try {
-            const peixesRegistrados: IPeixe[] = await db.query.peixe.findMany();
-            const lacreExistente = peixesRegistrados.some(
-                peixe => peixe.lacre === dados.lacre,
-            );
+            const payload = validarENormalizarPeixeFormulario(dados);
 
-            if (lacreExistente) {
-                Alert.alert('Já existe um pescado com este número de lacre!');
-            } else {
-                await db.insert(peixeSchema.peixe).values(dados);
-                setPescaRegistrada(true);
-            }
+            console.info('[RegistrarPescado] Banco pronto');
+            console.info('[RegistrarPescado] Dados validados');
+
+            await db.transaction(async (tx) => {
+                const [comunidade] = await tx
+                    .select({ id: comunidadeSchema.comunidades.id })
+                    .from(comunidadeSchema.comunidades)
+                    .where(eq(comunidadeSchema.comunidades.nome, payload.comunidade))
+                    .limit(1);
+
+                if (!comunidade) {
+                    throw new Error('Selecione uma comunidade valida.');
+                }
+
+                const [lago] = await tx
+                    .select({ id: lagoSchema.lagos.id })
+                    .from(lagoSchema.lagos)
+                    .where(
+                        and(
+                            eq(lagoSchema.lagos.nome, payload.lago),
+                            eq(lagoSchema.lagos.comunidadeId, comunidade.id),
+                        ),
+                    )
+                    .limit(1);
+
+                if (!lago) {
+                    throw new Error('Selecione um lago valido para a comunidade.');
+                }
+
+                const [lacreExistente] = await tx
+                    .select({ id: peixeSchema.peixe.id })
+                    .from(peixeSchema.peixe)
+                    .where(eq(peixeSchema.peixe.lacre, payload.lacre))
+                    .limit(1);
+
+                if (lacreExistente) {
+                    throw new Error('Ja existe um pescado com este numero de lacre.');
+                }
+
+                await tx.insert(peixeSchema.peixe).values(payload);
+            });
+
+            console.info('[RegistrarPescado] Cadastro concluido');
+            setPescaRegistrada(true);
+            return true;
         } catch (error) {
-            console.error('Erro ao cadastrar o peixe:', error);
-            Alert.alert(
-                'Erro',
-                'Não foi possível cadastrar o peixe. Tente novamente.',
-            );
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Nao foi possivel registrar o pescado.';
+
+            console.error('[RegistrarPescado] Falha', error);
+            Alert.alert('Erro ao registrar pescado', message);
+            return false;
         }
     };
 

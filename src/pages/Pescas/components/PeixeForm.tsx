@@ -19,11 +19,11 @@ import {
 
 import {
     hasDecimalBRRangeError,
-    isDecimalBRInRange,
 } from '../../../utils/numberValidators';
+import { validarENormalizarPeixeFormulario } from '../../../utils/validarPeixeFormulario';
 
 interface Props {
-    onSubmit: (dados: IPeixe) => void;
+    onSubmit: (dados: IPeixe) => boolean | void | Promise<boolean | void>;
     dadosIniciais?: IPeixe;
 }
 
@@ -45,6 +45,7 @@ const initialDados: IPeixe = {
 const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
     const theme = useTheme();
     const [dados, setDados] = useState<IPeixe>(dadosIniciais || initialDados);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const pesoHasError = hasDecimalBRRangeError(dados.peso, 40, 300);
 
@@ -70,49 +71,42 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
         });
     };
 
-    const handleSubmit = () => {
-        const pesoValido = isDecimalBRInRange(dados.peso, 40, 300);
-
-        const comprimentoValido = isDecimalBRInRange(
-            dados.comprimento,
-            0.5,
-            3,
-        );
-
-        if (!pesoValido) {
-            Alert.alert(
-                'Peso inválido',
-                'O peso deve estar entre 40kg e 300kg.',
-            );
+    const handleSubmit = async () => {
+        if (isSubmitting) {
             return;
         }
 
-        if (!comprimentoValido) {
-            Alert.alert(
-                'Comprimento inválido',
-                'O comprimento deve estar entre 0,5m e 3m.',
-            );
+        let payload: IPeixe;
+
+        try {
+            payload = validarENormalizarPeixeFormulario(dados);
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Preencha todos os campos obrigatorios.';
+            Alert.alert('Dados invalidos', message);
             return;
         }
 
-        const camposObrigatoriosPreenchidos =
-            dados.sexo &&
-            dados.lacre &&
-            dados.comprimento &&
-            dados.peso &&
-            dados.hPesca &&
-            dados.hEvisceramento &&
-            dados.lago &&
-            dados.comunidade &&
-            dados.gona;
+        setIsSubmitting(true);
 
-        if (!camposObrigatoriosPreenchidos) {
-            Alert.alert('Preencha todos os campos');
-            return;
+        try {
+            const result = await onSubmit(payload);
+
+            if (result !== false) {
+                setDados(initialDados);
+            }
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Nao foi possivel registrar o pescado.';
+            console.error('[RegistrarPescado] Falha no envio do formulario', error);
+            Alert.alert('Erro ao registrar pescado', message);
+        } finally {
+            setIsSubmitting(false);
         }
-
-        onSubmit(dados);
-        setDados(initialDados);
     };
 
     const gonadalOptions =
@@ -366,9 +360,11 @@ const FormPeixe: React.FC<Props> = ({ onSubmit, dadosIniciais }) => {
                         <AppButton
                             mode="contained"
                             onPress={handleSubmit}
+                            disabled={isSubmitting}
+                            loading={isSubmitting}
                             style={styles.button}
                         >
-                            Registrar
+                            {isSubmitting ? 'Registrando...' : 'Registrar'}
                         </AppButton>
                     </Surface>
                 </Surface>

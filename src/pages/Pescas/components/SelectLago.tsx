@@ -32,7 +32,7 @@ export default function SelectLago({
     } = useLagosPorComunidade({ nome: comunidadeNome });
 
     const labels = useMemo(() => {
-        const nomes = lagos.map((l: any) => String(l.nome));
+        const nomes = lagos.map((l) => String(l.nome));
 
         return sortAlphabetically
             ? [...nomes].sort((a, b) => a.localeCompare(b))

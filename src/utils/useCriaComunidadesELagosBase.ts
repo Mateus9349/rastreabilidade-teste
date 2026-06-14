@@ -1,73 +1,74 @@
+import { useCallback, useMemo } from "react";
 import { useSQLiteContext } from "expo-sqlite";
 import { drizzle } from "drizzle-orm/expo-sqlite";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+
 import * as comunidadeSchema from "../database/schemas/comunidadeSchema";
 import * as lagoSchema from "../database/schemas/lagoSchema";
-import { comunidades } from "./lagos"; // o arquivo com seus dados
+import { comunidades } from "./lagos";
 
 export function useCriaComunidadesELagosBase() {
     const database = useSQLiteContext();
-    const db = drizzle(database, { schema: { ...comunidadeSchema, ...lagoSchema } });
+    const db = useMemo(
+        () => drizzle(database, { schema: { ...comunidadeSchema, ...lagoSchema } }),
+        [database],
+    );
 
-    async function criarBase() {
-        try {
-            console.log("🚀 Iniciando criação de comunidades e lagos base...");
+    const criarBase = useCallback(async () => {
+        console.info("[DatabaseBootstrap] Iniciando base de comunidades e lagos");
 
-            for (const comunidade of comunidades) {
-                // 1️⃣ Verifica se a comunidade já existe
-                const existente = await db
-                    .select()
-                    .from(comunidadeSchema.comunidades)
-                    .where(eq(comunidadeSchema.comunidades.nome, comunidade.nome))
-                    .limit(1);
+        for (const comunidade of comunidades) {
+            const existente = await db
+                .select({ id: comunidadeSchema.comunidades.id })
+                .from(comunidadeSchema.comunidades)
+                .where(eq(comunidadeSchema.comunidades.nome, comunidade.nome))
+                .limit(1);
 
-                let comunidadeId: number;
+            let comunidadeId = existente[0]?.id;
 
-                if (existente.length === 0) {
-                    // 2️⃣ Cria comunidade nova
-                    const result = await db
-                        .insert(comunidadeSchema.comunidades)
-                        .values({
-                            nome: comunidade.nome,
-                            latitude: 0,
-                            longitude: 0,
-                        });
+            if (comunidadeId == null) {
+                const result = await db
+                    .insert(comunidadeSchema.comunidades)
+                    .values({
+                        nome: comunidade.nome,
+                        latitude: 0,
+                        longitude: 0,
+                    });
 
-                    // o drizzle com SQLite retorna { changes, lastInsertRowId }
-                    comunidadeId = (result as any).lastInsertRowId;
-                    console.log(`✅ Comunidade '${comunidade.nome}' criada (id ${comunidadeId})`);
-                } else {
-                    comunidadeId = existente[0].id;
-                    console.log(`⚠️ Comunidade '${comunidade.nome}' já existe (id ${comunidadeId})`);
-                }
+                comunidadeId = Number(result.lastInsertRowId);
 
-                // 3️⃣ Cria lagos associados
-                for (const lago of comunidade.lagos) {
-                    const lagoExistente = await db
-                        .select()
-                        .from(lagoSchema.lagos)
-                        .where(eq(lagoSchema.lagos.nome, lago.nome))
-                        .limit(1);
-
-                    if (lagoExistente.length === 0) {
-                        await db.insert(lagoSchema.lagos).values({
-                            nome: lago.nome,
-                            latitude: lago.latitude ?? 0,
-                            longitude: lago.longitude ?? 0,
-                            comunidadeId, // 🔹 FK correta
-                        });
-                        console.log(`   🌊 Lago '${lago.nome}' criado.`);
-                    } else {
-                        console.log(`   ⚠️ Lago '${lago.nome}' já existe.`);
-                    }
+                if (!Number.isFinite(comunidadeId)) {
+                    throw new Error(
+                        `Nao foi possivel obter o id da comunidade ${comunidade.nome}.`,
+                    );
                 }
             }
 
-            console.log("🎉 Comunidades e lagos base criados/atualizados com sucesso!");
-        } catch (error) {
-            console.error("❌ Erro ao criar comunidades e lagos base:", error);
+            for (const lago of comunidade.lagos) {
+                const lagoExistente = await db
+                    .select({ id: lagoSchema.lagos.id })
+                    .from(lagoSchema.lagos)
+                    .where(
+                        and(
+                            eq(lagoSchema.lagos.nome, lago.nome),
+                            eq(lagoSchema.lagos.comunidadeId, comunidadeId),
+                        ),
+                    )
+                    .limit(1);
+
+                if (lagoExistente.length === 0) {
+                    await db.insert(lagoSchema.lagos).values({
+                        nome: lago.nome,
+                        latitude: lago.latitude ?? 0,
+                        longitude: lago.longitude ?? 0,
+                        comunidadeId,
+                    });
+                }
+            }
         }
-    }
+
+        console.info("[DatabaseBootstrap] Base de comunidades e lagos pronta");
+    }, [db]);
 
     return { criarBase };
 }

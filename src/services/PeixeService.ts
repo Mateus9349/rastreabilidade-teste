@@ -3,6 +3,12 @@ import api from './api';
 import { IPeixe } from '../interfaces/Peixe';
 import { IPeixeDTO } from '../interfaces/DTO/Peixe.DTO';
 
+type CriarPeixePayload = Omit<IPeixeDTO, 'loteId' | 'lacre' | 'sexo'> & {
+  lacre: string | number;
+  sexo: string;
+  loteId?: number;
+};
+
 export class PeixeService {
   static async buscarPeixes(): Promise<IPeixe[]> {
     try {
@@ -25,7 +31,7 @@ export class PeixeService {
   }
 
   // cria UM peixe (segue disponível caso precise)
-  static async criarPeixe(peixe: IPeixeDTO): Promise<IPeixe> {
+  static async criarPeixe(peixe: CriarPeixePayload): Promise<IPeixe> {
     try {
       const response = await api.post<IPeixe>('/fishes', peixe);
       return response.data;

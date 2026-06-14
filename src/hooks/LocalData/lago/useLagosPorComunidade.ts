@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/expo-sqlite";
 import { eq } from "drizzle-orm";
 import * as comunidadeSchema from "../../../database/schemas/comunidadeSchema";
 import * as lagoSchema from "../../../database/schemas/lagoSchema";
+import { ILago } from "../../../interfaces/Lago";
 
 type Filtro = { comunidadeId?: number; nome?: string };
 
@@ -11,7 +12,7 @@ export function useLagosPorComunidade(filtro: Filtro) {
     const database = useSQLiteContext();
     const db = useMemo(() => drizzle(database, { schema: { ...lagoSchema, ...comunidadeSchema } }), [database]);
 
-    const [data, setData] = useState<any[]>([]);
+    const [data, setData] = useState<ILago[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<unknown>(null);
 
@@ -23,7 +24,7 @@ export function useLagosPorComunidade(filtro: Filtro) {
                 const { comunidades } = comunidadeSchema;
                 const { lagos } = lagoSchema;
 
-                let rows: any[] = [];
+                let rows: ILago[] = [];
                 if (filtro.comunidadeId != null) {
                     rows = await db.select().from(lagos).where(eq(lagos.comunidadeId, filtro.comunidadeId));
                 } else if (filtro.nome) {

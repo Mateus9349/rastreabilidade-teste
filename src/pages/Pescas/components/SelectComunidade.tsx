@@ -22,7 +22,7 @@ export default function SelectComunidade({
     sortAlphabetically = true,
 }: Props) {
     const theme = useTheme();
-    const { comunidades, listarComunidades } = useLocalComunidades();
+    const { comunidades, listarComunidades, loading, error } = useLocalComunidades();
 
     const labels = useMemo(() => {
         const nomes = comunidades.map((c) => c.nome);
@@ -32,9 +32,7 @@ export default function SelectComunidade({
             : nomes;
     }, [comunidades, sortAlphabetically]);
 
-    const isLoading = comunidades.length === 0;
-
-    if (isLoading) {
+    if (loading) {
         return (
             <Surface style={styles.container} elevation={0}>
                 <AppText variant="labelLarge" style={styles.label}>
@@ -60,6 +58,48 @@ export default function SelectComunidade({
                     >
                         Carregando comunidades…
                     </AppText>
+                </Surface>
+            </Surface>
+        );
+    }
+
+    if (error) {
+        return (
+            <Surface style={styles.container} elevation={0}>
+                <AppText variant="labelLarge" style={styles.label}>
+                    {title}
+                </AppText>
+
+                <Surface
+                    elevation={0}
+                    style={[
+                        styles.feedbackBox,
+                        {
+                            borderColor: theme.colors.outline,
+                            backgroundColor: theme.colors.surface,
+                        },
+                    ]}
+                >
+                    <AppText
+                        variant="bodyMedium"
+                        color={theme.colors.onSurfaceVariant}
+                    >
+                        Erro ao carregar comunidades
+                    </AppText>
+
+                    <TouchableRipple
+                        borderless
+                        onPress={listarComunidades}
+                        style={styles.retryButton}
+                    >
+                        <AppText
+                            variant="labelLarge"
+                            color={theme.colors.primary}
+                            style={styles.retryText}
+                        >
+                            Tentar novamente
+                        </AppText>
+                    </TouchableRipple>
                 </Surface>
             </Surface>
         );

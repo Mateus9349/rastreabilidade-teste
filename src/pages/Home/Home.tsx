@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Image, StyleSheet, ScrollView } from 'react-native';
 import { ActivityIndicator, Surface, Text, useTheme } from 'react-native-paper';
 import { Link } from '@react-navigation/native';
@@ -9,7 +9,6 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { RootStackParamList } from '../../navigation/types';
 import { useCustomFonts } from '../../utils/fonts';
 import { AuthContext } from '../../contexts/AuthContext';
-import { useCriaComunidadesELagosBase } from '../../utils/useCriaComunidadesELagosBase';
 
 import HomeOptionCard from './components/HomeOptionCard';
 
@@ -17,14 +16,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function Home({ navigation }: Props) {
   const theme = useTheme();
-  const { criarBase } = useCriaComunidadesELagosBase();
 
   const { user } = useContext(AuthContext);
   const [fontsLoaded] = useCustomFonts();
-
-  useEffect(() => {
-    criarBase();
-  }, []);
 
   if (!fontsLoaded) {
     return <ActivityIndicator size="large" style={styles.loader} />;
