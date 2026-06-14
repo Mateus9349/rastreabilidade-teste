@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { LoteService } from '../../services/LoteService';
-import { ILote } from '../../interfaces/Lote';
+import { ILoteDTO } from '../../interfaces/DTO/Lote.DTO';
 
 export const useLote = (id: number) => {
-  const [lote, setLote] = useState<ILote | null>(null);
+  const [lote, setLote] = useState<ILoteDTO | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

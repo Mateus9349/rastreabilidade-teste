@@ -1,26 +1,31 @@
 import React, { useContext, useState } from "react";
-import { ScrollView, Text, TextInput, Button, StyleSheet, View, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { Surface, Text, useTheme, Divider } from "react-native-paper";
+import { useSQLiteContext } from "expo-sqlite";
+import { drizzle } from "drizzle-orm/expo-sqlite";
+
 import { IUser } from "../interfaces/User";
 import { AuthContext } from "../contexts/AuthContext";
 
-
-
 import { useCriarLoteCom500Auto } from "../hooks/lote/useCriarLoteCom500";
-import { useSQLiteContext } from "expo-sqlite";
 import * as peixeSchema from "../database/schemas/peixeSchema";
 import * as loteSchema from "../database/schemas/loteSchema";
-import { drizzle } from "drizzle-orm/expo-sqlite";
+
+import AppButton from "../components/ui/AppButton";
+import AppInput from "../components/ui/AppInput";
+import AppCard from "../components/ui/AppCard";
 
 export default function UserScreen() {
+  const theme = useTheme();
   const { user, logout } = useContext(AuthContext);
   const [isEditing, setIsEditing] = useState(false);
   const [editUser, setEditUser] = useState<IUser | null>(user);
-
 
   /** UMA única conexão drizzle com ambos schemas */
   const database = useSQLiteContext();
   const db = drizzle(database, { schema: { ...peixeSchema, ...loteSchema } });
   const { criarLoteCom500Auto, loading } = useCriarLoteCom500Auto();
+
   const lote = async () => {
     const base = {
       planilha: 2026,
@@ -34,10 +39,10 @@ export default function UserScreen() {
     } as const;
 
     const res = await criarLoteCom500Auto(db, base, {
-      pesoMinKg: 8,      // opcional (default 5)
-      pesoMaxKg: 140,    // exigência
-      compMinM: 0.8,     // opcional
-      compMaxM: 1.7,     // exigência
+      pesoMinKg: 8,
+      pesoMaxKg: 140,
+      compMinM: 0.8,
+      compMaxM: 1.7,
       createdBy: "Mateus",
     });
 
@@ -46,9 +51,16 @@ export default function UserScreen() {
 
   if (!user) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Usuário não encontrado</Text>
-      </View>
+      <Surface style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+        <View style={styles.emptyContainer}>
+          <Text
+            variant="headlineSmall"
+            style={[styles.emptyTitle, { color: theme.colors.primary }]}
+          >
+            Usuário não encontrado
+          </Text>
+        </View>
+      </Surface>
     );
   }
 
@@ -68,160 +80,246 @@ export default function UserScreen() {
       // Aqui você pode implementar a lógica para salvar os dados atualizados (ex.: enviar ao backend).
       console.log("Usuário atualizado:", editUser);
     }
+
     setIsEditing(false);
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Informações do Usuário</Text>
+    <Surface style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text
+          variant="headlineLarge"
+          style={[styles.title, { color: theme.colors.primary }]}
+        >
+          Informações do Usuário
+        </Text>
 
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>ID:</Text>
-        <Text style={styles.value}>{user.id}</Text>
-      </View>
+        <Text
+          variant="bodyMedium"
+          style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
+        >
+          Visualize e gerencie os dados do usuário logado
+        </Text>
 
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Email:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editUser?.email || ""}
-            onChangeText={(value) => handleInputChange("email", value)}
-            keyboardType="email-address"
-          />
-        ) : (
-          <Text style={styles.value}>{user.email}</Text>
-        )}
-      </View>
+        <AppCard style={styles.card}>
+          <View style={styles.fieldContainer}>
+            <Text
+              variant="labelLarge"
+              style={[styles.label, { color: theme.colors.onSurfaceVariant }]}
+            >
+              ID
+            </Text>
 
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Nome:</Text>
-        {isEditing ? (
-          <TextInput
-            style={styles.input}
-            value={editUser?.nome || ""}
-            onChangeText={(value) => handleInputChange("nome", value)}
-          />
-        ) : (
-          <Text style={styles.value}>{user.nome}</Text>
-        )}
-      </View>
+            <Text
+              variant="bodyLarge"
+              style={[styles.value, { color: theme.colors.onSurface }]}
+            >
+              {user.id}
+            </Text>
+          </View>
 
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Permissões:</Text>
-        <Text style={styles.value}>{user.permissoes.join(", ")}</Text>
-      </View>
+          <Divider style={styles.divider} />
 
-      {isEditing && (
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Senha:</Text>
-          <TextInput
-            style={styles.input}
-            value={editUser?.senha || ""}
-            onChangeText={(value) => handleInputChange("senha", value)}
-            secureTextEntry
-          />
+          <View style={styles.fieldContainer}>
+            <Text
+              variant="labelLarge"
+              style={[styles.label, { color: theme.colors.onSurfaceVariant }]}
+            >
+              Email
+            </Text>
+
+            {isEditing ? (
+              <AppInput
+                value={editUser?.email || ""}
+                onChangeText={(value: string) => handleInputChange("email", value)}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                style={styles.input}
+              />
+            ) : (
+              <Text
+                variant="bodyLarge"
+                style={[styles.value, { color: theme.colors.onSurface }]}
+              >
+                {user.email}
+              </Text>
+            )}
+          </View>
+
+          <Divider style={styles.divider} />
+
+          <View style={styles.fieldContainer}>
+            <Text
+              variant="labelLarge"
+              style={[styles.label, { color: theme.colors.onSurfaceVariant }]}
+            >
+              Nome
+            </Text>
+
+            {isEditing ? (
+              <AppInput
+                value={editUser?.nome || ""}
+                onChangeText={(value: string) => handleInputChange("nome", value)}
+                style={styles.input}
+              />
+            ) : (
+              <Text
+                variant="bodyLarge"
+                style={[styles.value, { color: theme.colors.onSurface }]}
+              >
+                {user.nome}
+              </Text>
+            )}
+          </View>
+
+          <Divider style={styles.divider} />
+
+          <View style={styles.fieldContainer}>
+            <Text
+              variant="labelLarge"
+              style={[styles.label, { color: theme.colors.onSurfaceVariant }]}
+            >
+              Permissões
+            </Text>
+
+            <Text
+              variant="bodyLarge"
+              style={[styles.value, { color: theme.colors.onSurface }]}
+            >
+              {user.permissoes.join(", ")}
+            </Text>
+          </View>
+
+          {isEditing && (
+            <>
+              <Divider style={styles.divider} />
+
+              <View style={styles.fieldContainer}>
+                <Text
+                  variant="labelLarge"
+                  style={[styles.label, { color: theme.colors.onSurfaceVariant }]}
+                >
+                  Senha
+                </Text>
+
+                <AppInput
+                  value={editUser?.senha || ""}
+                  onChangeText={(value: string) => handleInputChange("senha", value)}
+                  secureTextEntry
+                  style={styles.input}
+                />
+              </View>
+            </>
+          )}
+        </AppCard>
+
+        {/* <View style={styles.actions}>
+          {isEditing ? (
+            <AppButton mode="contained" onPress={handleSave} style={styles.button}>
+              Salvar
+            </AppButton>
+          ) : (
+            <AppButton mode="contained" onPress={toggleEditing} style={styles.button}>
+              Editar
+            </AppButton>
+          )}
+
+          {isEditing && (
+            <AppButton
+              mode="outlined"
+              onPress={toggleEditing}
+              style={styles.button}
+              textColor={theme.colors.primary}
+            >
+              Cancelar
+            </AppButton>
+          )}
+        </View> */}
+
+        <View style={styles.footerActions}>
+          <AppButton
+            mode="contained-tonal"
+            onPress={logout}
+            style={styles.button}
+            buttonColor={theme.colors.errorContainer}
+            textColor={theme.colors.onErrorContainer}
+          >
+            Logout
+          </AppButton>
+
+          {/* <AppButton
+            mode="contained"
+            onPress={lote}
+            style={styles.button}
+            loading={loading}
+            disabled={loading}
+          >
+            Cadastrar Lote
+          </AppButton> */}
         </View>
-      )}
-
-      <View style={styles.buttonContainer}>
-        {isEditing ? (
-          <TouchableOpacity style={styles.buttonEdit} onPress={handleSave}>
-            <Text style={styles.textButton}>Salvar</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.buttonEdit} onPress={toggleEditing}>
-            <Text style={styles.textButton}>Editar</Text>
-          </TouchableOpacity>
-        )}
-        {isEditing &&
-          <TouchableOpacity style={styles.buttonEditCancel} onPress={toggleEditing}>
-            <Text style={styles.textButton}>Cancelar</Text>
-          </TouchableOpacity>
-        }
-      </View>
-
-      <TouchableOpacity style={styles.logout} onPress={logout}>
-        <Text style={styles.textButton}>Logout</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.buttonEditCancel} onPress={lote}>
-        <Text style={styles.textButton}>Cadastrar Lote</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </Surface>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  screen: {
+    flex: 1,
+  },
+  content: {
+    flexGrow: 1,
+    paddingTop: 72,
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-    color: '#FFFFFF'
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  subtitle: {
+    marginBottom: 28,
+  },
+  card: {
+    marginBottom: 24,
   },
   fieldContainer: {
-    marginBottom: 15,
+    gap: 6,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: '#BFC6D6'
+    fontWeight: "700",
   },
   value: {
-    fontSize: 16,
-    color: '#EAE5FF'
+    lineHeight: 22,
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    fontSize: 16,
-    marginTop: 5,
-    color: '#EAE5FF'
+    marginTop: 2,
   },
-  buttonContainer: {
-    width: '100%',
-    marginTop: 20,
-    gap: 5,
-    alignItems: 'center',
-    justifyContent: 'center'
+  divider: {
+    marginVertical: 16,
+  },
+  actions: {
+    width: "100%",
+    gap: 12,
+  },
+  footerActions: {
+    width: "100%",
+    gap: 12,
+    marginTop: 40,
   },
   button: {
-    backgroundColor: '#D4A85B'
+    width: "100%",
   },
-  logout: {
-    backgroundColor: '#871B21',
-    height: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 15,
-    marginTop: 65,
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
   },
-  buttonEdit: {
-    backgroundColor: '#D4A85B',
-    height: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 15,
-    marginTop: 15,
-    minWidth: '100%'
+  emptyTitle: {
+    fontWeight: "700",
+    textAlign: "center",
   },
-  buttonEditCancel: {
-    backgroundColor: 'blue',
-    height: 38,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 15,
-    marginTop: 15,
-    minWidth: '100%'
-  },
-  textButton: {
-    color: '#FFFFFF',
-    fontWeight: 'bold'
-  }
 });

@@ -1,17 +1,17 @@
 import React, { useState, useContext } from 'react';
-import {
-  View,
-  TextInput,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity
-} from 'react-native';
-import { AuthContext } from '../contexts/AuthContext';
+import { StyleSheet, Alert } from 'react-native';
+import { ActivityIndicator, Surface, useTheme } from 'react-native-paper';
 import Feather from '@expo/vector-icons/Feather';
 
+import { AuthContext } from '../contexts/AuthContext';
+
+import AppButton from '../components/ui/AppButton';
+import AppInput from '../components/ui/AppInput';
+import AppText from '../components/ui/AppText';
+
 export default function LoginScreen() {
+  const theme = useTheme();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loginGuest } = useContext(AuthContext);
@@ -23,7 +23,10 @@ export default function LoginScreen() {
     setCarregando(false);
 
     if (!loginSuccess) {
-      Alert.alert("Erro de Login", "Não foi possível autenticar no Keycloak. Verifique usuário/senha e as variáveis EXPO_PUBLIC_KEYCLOAK_*.");
+      Alert.alert(
+        'Erro de Login',
+        'Não foi possível autenticar no Keycloak. Verifique usuário/senha e as variáveis EXPO_PUBLIC_KEYCLOAK_*.'
+      );
     }
   };
 
@@ -34,88 +37,119 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login Keycloak</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        placeholderTextColor={'#F9F9F9'}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={password}
-        onChangeText={setPassword}
-        autoCapitalize="none"
-        secureTextEntry
-        placeholderTextColor={'#F9F9F9'}
-      />
+    <Surface style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <Surface style={styles.content}>
+        <AppText
+          variant="headlineLarge"
+          style={[styles.title, { color: theme.colors.primary }]}
+        >
+          Login
+        </AppText>
 
-      <TouchableOpacity style={styles.btn} onPress={handleKeycloakLogin} disabled={carregando}>
-        <Text style={styles.btnText}>Entrar com Keycloak</Text>
-      </TouchableOpacity>
-      {carregando && <ActivityIndicator style={styles.loading} />}
+        <AppText
+          variant="bodyMedium"
+          style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}
+        >
+          Acesse sua conta para continuar
+        </AppText>
 
-      <TouchableOpacity style={styles.btn2} onPress={handleGuest} disabled={carregando}>
-        <Feather name="user" size={34} color="white" />
-        <Text style={styles.btnText}>Entrar como convidado</Text>
-      </TouchableOpacity>
-    </View>
+        <AppInput
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          textColor={theme.colors.onSurface}
+          placeholderTextColor={theme.colors.onSurfaceVariant}
+          style={styles.input}
+        />
+
+        <AppInput
+          label="Senha"
+          value={password}
+          onChangeText={setPassword}
+          autoCapitalize="none"
+          secureTextEntry
+          textColor={theme.colors.onSurface}
+          placeholderTextColor={theme.colors.onSurfaceVariant}
+          style={styles.input}
+        />
+
+        <AppButton
+          mode="contained"
+          onPress={handleKeycloakLogin}
+          disabled={carregando}
+          style={styles.primaryButton}
+          contentStyle={styles.buttonContent}
+        >
+          Entrar
+        </AppButton>
+
+        {carregando && (
+          <ActivityIndicator
+            style={styles.loading}
+            color={theme.colors.primary}
+          />
+        )}
+
+        <AppButton
+          mode="contained-tonal"
+          onPress={handleGuest}
+          disabled={carregando}
+          style={styles.guestButton}
+          contentStyle={styles.guestButtonContent}
+          icon={() => (
+            <Feather
+              name="user"
+              size={24}
+              color={theme.colors.onSecondaryContainer}
+            />
+          )}
+        >
+          Entrar como convidado
+        </AppButton>
+      </Surface>
+    </Surface>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-    gap: 10,
+  screen: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 40,
   },
   title: {
-    fontSize: 24,
-    marginBottom: 16,
-    color: '#D4A85B',
-    fontWeight: 200
+    fontWeight: '700',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  subtitle: {
+    marginBottom: 28,
+    textAlign: 'center',
   },
   input: {
-    width: '100%',
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#D4A85B',
     marginBottom: 16,
-    borderRadius: 15,
-    textAlign: 'center',
-    color: '#FFFFF',
-    fontSize: 12
+  },
+  primaryButton: {
+    marginTop: 8,
+    borderRadius: 12,
+  },
+  buttonContent: {
+    minHeight: 48,
   },
   loading: {
-    marginTop: 16
+    marginTop: 16,
   },
-  btn: {
-    width: 200,
-    borderRadius: 10,
-    backgroundColor: '#871B21',
-    padding: 12
+  guestButton: {
+    marginTop: 32,
+    borderRadius: 12,
   },
-  btn2: {
-    width: 200,
-    height: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-    backgroundColor: '#320d0fff',
-    padding: 8,
-    gap: 16,
-    position: 'relative',
-    top: 120
+  guestButtonContent: {
+    minHeight: 56,
   },
-  btnText: {
-    color: '#F9F9F9',
-    textAlign: 'center'
-  }
 });

@@ -1,39 +1,50 @@
 export default {
   expo: {
-    name: "GIGANTIO",
-    slug: "rastreabilidade-teste",
+    name: "Gygas",
+    slug: "gygas",
     version: "1.0.0",
     orientation: "portrait",
     userInterfaceStyle: "light",
     icon: "./assets/icon.png",
-    splash: {
-      image: "./assets/splash.png",
-      resizeMode: "contain",
-      backgroundColor: "#ffffff"
-    },
-    assetBundlePatterns: ["**/*"],
-    ios: {
-      supportsTablet: true,
-      bundleIdentifier: "com.mateus9349.rastreabilidadeteste"
-    },
+
+    plugins: [
+      "expo-font",
+      "expo-sqlite",
+      [
+        "expo-splash-screen",
+        {
+          image: "./assets/splash.png",
+          resizeMode: "contain",
+          backgroundColor: "#001b45",
+          imageWidth: 200
+        }
+      ]
+    ],
+
     android: {
-      package: "com.mateus9349.rastreabilidadeteste",
+      package: "org.fasamazonia.gygas",
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
-        backgroundColor: "#A11814"
+        backgroundColor: "#001b45"
       }
     },
+
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: "org.fasamazonia.gygas"
+    },
+
     web: {
       favicon: "./assets/favicon.png"
     },
+
+    experiments: {
+      newArchEnabled: true
+    },
+
     extra: {
       eas: {
-        projectId: "0a39980e-3718-4ea3-9318-5bdb4665f75f"
-      },
-      expoClient: {
-        experiments: {
-          newArchEnabled: true
-        }
+        projectId: "7c1d5edc-23c4-462a-ab49-6cf30f47a021"
       },
       keycloak: {
         baseUrl: process.env.EXPO_PUBLIC_KEYCLOAK_BASE_URL || "",
@@ -41,13 +52,6 @@ export default {
         clientId: process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_ID || "",
         clientSecret: process.env.EXPO_PUBLIC_KEYCLOAK_CLIENT_SECRET || ""
       }
-    },
-    plugins: [
-      "expo-font",
-      "expo-sqlite"
-    ],
-    experiments: {
-      newArchEnabled: true
     }
   }
 };

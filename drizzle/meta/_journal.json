@@ -15,6 +15,13 @@
       "when": 1758236472597,
       "tag": "0001_supreme_penance",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1781467200000,
+      "tag": "0002_unique_peixes_lacre",
+      "breakpoints": true
     }
   ]
 }

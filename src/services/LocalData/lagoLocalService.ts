@@ -24,7 +24,7 @@ export class LagoLocalService {
 
     static async listar(db: any): Promise<ILago[]> {
         // se houver registros antigos com null/strings, converta aqui também (opcional)
-        const rows = await db.select().from(lagos);
+        const rows: ILago[] = await db.select().from(lagos);
         return rows.map(r => ({
             ...r,
             latitude: toNumberOrNull(r.latitude) ?? 0,
