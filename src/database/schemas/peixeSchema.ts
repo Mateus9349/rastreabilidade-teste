@@ -1,4 +1,4 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // Define a tabela "peixes" com base na interface IPeixe
 export const peixe = sqliteTable("peixes", {
@@ -16,5 +16,6 @@ export const peixe = sqliteTable("peixes", {
   comunidade: text("comunidade").notNull(),       // Campo "comunidade" como texto não nulo
   hEvisceramento: text("hEvisceramento").notNull(), // Campo "hEvisceramento" como texto não nulo
   ativo: integer("ativo").notNull().default(1),    // Campo "ativo" como inteiro: 0 para falso, 1 para verdadeiro
-});
-
+}, (table) => ({
+  peixesLacreUniqueIdx: uniqueIndex("peixes_lacre_unique_idx").on(table.lacre),
+}));

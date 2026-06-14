@@ -17,17 +17,31 @@ export function useLagosPorComunidade(filtro: Filtro) {
     const [error, setError] = useState<unknown>(null);
 
     useEffect(() => {
+        let active = true;
+        const comunidadeNome = filtro.nome?.trim();
+
+        if (filtro.comunidadeId == null && !comunidadeNome) {
+            setData([]);
+            setError(null);
+            setLoading(false);
+
+            return () => {
+                active = false;
+            };
+        }
+
         (async () => {
             try {
                 setLoading(true);
                 setError(null);
+                console.info("[Pescas][Lagos] Consulta local iniciada");
                 const { comunidades } = comunidadeSchema;
                 const { lagos } = lagoSchema;
 
                 let rows: ILago[] = [];
                 if (filtro.comunidadeId != null) {
                     rows = await db.select().from(lagos).where(eq(lagos.comunidadeId, filtro.comunidadeId));
-                } else if (filtro.nome) {
+                } else if (comunidadeNome) {
                     rows = await db
                         .select({
                             id: lagos.id,
@@ -38,18 +52,28 @@ export function useLagosPorComunidade(filtro: Filtro) {
                         })
                         .from(lagos)
                         .innerJoin(comunidades, eq(lagos.comunidadeId, comunidades.id))
-                        .where(eq(comunidades.nome, filtro.nome));
-                } else {
-                    rows = await db.select().from(lagos); // fallback
+                        .where(eq(comunidades.nome, comunidadeNome));
                 }
 
-                setData(rows);
+                if (active) {
+                    console.info("[Pescas][Lagos] Consulta local concluida");
+                    setData(rows);
+                }
             } catch (e) {
-                setError(e);
+                if (active) {
+                    console.error("[Pescas][Lagos] Falha ao listar lagos", e);
+                    setError(e);
+                }
             } finally {
-                setLoading(false);
+                if (active) {
+                    setLoading(false);
+                }
             }
         })();
+
+        return () => {
+            active = false;
+        };
     }, [db, filtro.comunidadeId, filtro.nome]);
 
     return { data, loading, error };

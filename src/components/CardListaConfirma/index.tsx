@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Pressable, Alert, ScrollView } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { IPeixe } from "../../interfaces/Peixe";
-import FormPeixe from '../../pages/Pescas/components/PeixeForm';
+import { PescaForm } from '../../features/pescas';
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import * as peixeSchema from '../../database/schemas/peixeSchema';
@@ -142,7 +142,7 @@ export default function CardListaConfirma({ lote }: Props) {
                         {/* Render only the editing form for the specific fish */}
                         {editingPeixeId === peixe.id && (
                             <View style={styles.formContainer}>
-                                <FormPeixe
+                                <PescaForm
                                     dadosIniciais={peixe}
                                     onSubmit={(dadosEditados: IPeixe) => editarPeixe(dadosEditados, peixe.id)}
                                 />

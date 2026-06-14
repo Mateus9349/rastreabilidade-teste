@@ -8,10 +8,7 @@ import { RootStackParamList } from "../navigation/types";
 
 import Home from "../pages/Home/Home";
 import DetailsScreen from "../pages/DetailsScreen";
-import RegistrarPeixe from "../pages/Pescas/components/RegistrarPeixe";
 import Teste from "../pages/TesteScreen";
-import PeixesRegistrados from "../pages/PeixesRegistrados";
-import PescasScreen from "../pages/Pescas/PescasScreen";
 import GuiaDeTransporte from "../pages/GuiaDeTransporte";
 import GuiaDeConfirmacao from "../pages/GuiaDeConfirmacao";
 import LoginScreen from "../pages/LoginScreen";
@@ -19,6 +16,11 @@ import UserScreen from "../pages/UserScreen";
 import PrepararLoteScreen from "../pages/PrepararLoteScreen";
 import Comunidades from "../pages/Comunidades";
 import Lagos from "../pages/Lagos";
+import {
+  ListarPescasScreen,
+  PescasScreen,
+  RegistrarPescaScreen,
+} from "../features/pescas";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -70,8 +72,8 @@ export default function AppNavigator() {
         <>
           <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
           <Stack.Screen name="Pescas" component={PescasScreen} options={defaultScreenOptions} />
-          <Stack.Screen name="RegistrarPeixe" component={RegistrarPeixe} options={defaultScreenOptions} />
-          <Stack.Screen name="PeixesRegistrados" component={PeixesRegistrados} options={defaultScreenOptions} />
+          <Stack.Screen name="RegistrarPeixe" component={RegistrarPescaScreen} options={defaultScreenOptions} />
+          <Stack.Screen name="PeixesRegistrados" component={ListarPescasScreen} options={defaultScreenOptions} />
           <Stack.Screen name="PrepararLote" component={PrepararLoteScreen} options={defaultScreenOptions} />
           <Stack.Screen name="Details" component={DetailsScreen} options={defaultScreenOptions} />
           <Stack.Screen name="Teste" component={Teste} options={defaultScreenOptions} />

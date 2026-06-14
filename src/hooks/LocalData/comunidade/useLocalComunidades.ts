@@ -14,24 +14,37 @@ export function useLocalComunidades() {
   const database = useSQLiteContext();
   const db = useMemo(() => drizzle(database, { schema: comunidadeSchema }), [database]);
 
-  const listarComunidades = useCallback(async () => {
+  const listarComunidades = useCallback(async (
+    shouldApply: () => boolean = () => true,
+  ) => {
     setLoading(true);
     setError(null);
 
     try {
       const lista = await ComunidadeLocalService.listar(db);
-      setComunidades(lista);
+      if (shouldApply()) {
+        setComunidades(lista);
+      }
     } catch (err) {
       console.error("[Comunidades] Erro ao listar comunidades locais", err);
-      setError(err);
-      setComunidades([]);
+      if (shouldApply()) {
+        setError(err);
+        setComunidades([]);
+      }
     } finally {
-      setLoading(false);
+      if (shouldApply()) {
+        setLoading(false);
+      }
     }
   }, [db]);
 
   useEffect(() => {
-    listarComunidades();
+    let active = true;
+    listarComunidades(() => active);
+
+    return () => {
+      active = false;
+    };
   }, [listarComunidades]);
 
   return { comunidades, listarComunidades, loading, error };
