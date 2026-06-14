@@ -1,9 +1,16 @@
-import { View, Text, Alert, TouchableOpacity } from "react-native";
-import { ILago } from "../../interfaces/Lago";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { useLocalComunidades } from "../../hooks/LocalData/comunidade/useLocalComunidades";
+import React from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
+import {
+    Card,
+    IconButton,
+    Text,
+    TouchableRipple,
+    useTheme,
+} from 'react-native-paper';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
+import { ILago } from '../../interfaces/Lago';
+import { useLocalComunidades } from '../../hooks/LocalData/comunidade/useLocalComunidades';
 
 interface Props {
     lago: ILago;
@@ -12,58 +19,160 @@ interface Props {
 }
 
 export default function CardLago({ lago, editar, excluir }: Props) {
+    const theme = useTheme();
     const { comunidades } = useLocalComunidades();
 
     const comunidade = comunidades.find((c) => c.id === lago.comunidadeId);
 
-    return (
-        <View
-            style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "100%",
-                marginBottom: 20,
-            }}
-        >
-            <MaterialCommunityIcons name="waves" size={24} color="blue" />
+    const handleExcluir = () => {
+        if (!lago.id) {
+            return;
+        }
 
-            <View style={{ marginLeft: 25, gap: 2 }}>
-                <Text style={{ color: "white" }}>Nome: {lago.nome}</Text>
-                <Text style={{ color: "white" }}>
-                    Localização: {lago.latitude.toFixed(2)}, {lago.longitude.toFixed(2)}
-                </Text>
-                <Text style={{ color: "white" }}>
-                    Comunidade: {comunidade ? comunidade.nome : "Não encontrada"}
-                </Text>
-            </View>
-
-            <View style={{ flexDirection: "row", gap: 5, marginLeft: 25, alignItems: 'center' }}>
-                <TouchableOpacity onPress={() => editar(lago)}>
-                    <MaterialIcons name="edit-note" size={34} color="blue" />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    onPress={() => {
+        Alert.alert(
+            'Confirmar exclusão',
+            'Tem certeza que deseja excluir este lago?',
+            [
+                {
+                    text: 'Cancelar',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Excluir',
+                    style: 'destructive',
+                    onPress: () => {
                         if (lago.id) {
-                            Alert.alert(
-                                "Confirmar exclusão",
-                                "Tem certeza que deseja excluir este lago?",
-                                [
-                                    { text: "Cancelar", style: "cancel" },
-                                    {
-                                        text: "Excluir",
-                                        style: "destructive",
-                                        onPress: () => excluir(lago.id!),
-                                    },
-                                ]
-                            );
+                            excluir(lago.id);
                         }
-                    }}
-                >
-                    <AntDesign name="delete" size={24} color="red" />
-                </TouchableOpacity>
-            </View>
-        </View>
+                    },
+                },
+            ]
+        );
+    };
+
+    return (
+        <Card
+            mode="elevated"
+            style={[
+                styles.card,
+                {
+                    backgroundColor: theme.colors.surface,
+                    borderColor: theme.colors.outline,
+                },
+            ]}
+        >
+            <TouchableRipple onPress={() => editar(lago)} borderless>
+                <View style={styles.row}>
+                    <View
+                        style={[
+                            styles.iconContainer,
+                            {
+                                backgroundColor: theme.colors.primary,
+                            },
+                        ]}
+                    >
+                        <MaterialCommunityIcons
+                            name="waves"
+                            size={26}
+                            color={theme.colors.onPrimary}
+                        />
+                    </View>
+
+                    <View style={styles.content}>
+                        <Text
+                            variant="titleMedium"
+                            numberOfLines={1}
+                            style={[
+                                styles.title,
+                                {
+                                    color: theme.colors.primary,
+                                },
+                            ]}
+                        >
+                            {lago.nome}
+                        </Text>
+
+                        <Text
+                            variant="bodySmall"
+                            style={[
+                                styles.description,
+                                {
+                                    color: theme.colors.onSurfaceVariant,
+                                },
+                            ]}
+                        >
+                            Localização: {lago.latitude.toFixed(2)},{' '}
+                            {lago.longitude.toFixed(2)}
+                        </Text>
+
+                        <Text
+                            variant="bodySmall"
+                            numberOfLines={1}
+                            style={[
+                                styles.description,
+                                {
+                                    color: theme.colors.onSurfaceVariant,
+                                },
+                            ]}
+                        >
+                            Comunidade:{' '}
+                            {comunidade ? comunidade.nome : 'Não encontrada'}
+                        </Text>
+                    </View>
+
+                    <View style={styles.actions}>
+                        <IconButton
+                            icon="pencil-outline"
+                            size={24}
+                            iconColor={theme.colors.primary}
+                            onPress={() => editar(lago)}
+                        />
+
+                        <IconButton
+                            icon="delete-outline"
+                            size={24}
+                            iconColor={theme.colors.error}
+                            onPress={handleExcluir}
+                        />
+                    </View>
+                </View>
+            </TouchableRipple>
+        </Card>
     );
 }
+
+const styles = StyleSheet.create({
+    card: {
+        borderRadius: 20,
+        borderWidth: 1,
+        overflow: 'hidden',
+    },
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 14,
+    },
+    iconContainer: {
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 14,
+    },
+    content: {
+        flex: 1,
+    },
+    title: {
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    description: {
+        lineHeight: 18,
+    },
+    actions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 8,
+    },
+});

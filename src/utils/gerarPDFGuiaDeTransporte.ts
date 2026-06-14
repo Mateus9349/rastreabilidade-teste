@@ -1,7 +1,7 @@
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { Alert } from "react-native";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import { IPeixe } from "../interfaces/Peixe";
 import { ILote } from "../interfaces/Lote";
 
@@ -10,12 +10,18 @@ interface Props {
   lote: ILote;
 }
 
-export async function gerarEPDFDownloadExpo({ peixes, lote }: Props): Promise<void> {
+export async function gerarEPDFDownloadExpo({
+  peixes,
+  lote,
+}: Props): Promise<void> {
   try {
-    // --- Helpers ---
     function chunk<T>(arr: T[], size: number) {
       const out: T[][] = [];
-      for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+
+      for (let i = 0; i < arr.length; i += size) {
+        out.push(arr.slice(i, i + size));
+      }
+
       return out;
     }
 
@@ -23,26 +29,29 @@ export async function gerarEPDFDownloadExpo({ peixes, lote }: Props): Promise<vo
       return rowsPeixes
         .map(
           (p) => `
-          <tr>
-            <td>${p.especie ?? ""}</td>
-            <td>${p.lacre ?? ""}</td>
-            <td>1</td>
-            <td>${p.cat ?? ""}</td>
-            <td>${p.comprimento ?? ""}</td>
-            <td>${p.peso ?? ""}</td>
-            <td>${p.sexo ?? ""}</td>
-            <td>${p.gona ?? ""}</td>
-          </tr>
-        `
+            <tr>
+              <td>${p.especie ?? ""}</td>
+              <td>${p.lacre ?? ""}</td>
+              <td>1</td>
+              <td>${p.cat ?? ""}</td>
+              <td>${p.comprimento ?? ""}</td>
+              <td>${p.peso ?? ""}</td>
+              <td>${p.sexo ?? ""}</td>
+              <td>${p.gona ?? ""}</td>
+            </tr>
+          `
         )
         .join("");
     }
 
-    const dataBR = new Date(lote.data).toLocaleDateString("pt-BR");
+    const dataBR = lote.data
+      ? new Date(lote.data).toLocaleDateString("pt-BR")
+      : "";
 
     function renderPage(rowsPeixes: IPeixe[], pageIndex: number) {
       const rowsHtml = renderRows(rowsPeixes);
-      const showPageBreak = pageIndex > 0 ? 'style="page-break-before: always;"' : "";
+      const showPageBreak =
+        pageIndex > 0 ? 'style="page-break-before: always;"' : "";
 
       return `
         <section class="section" ${showPageBreak}>
@@ -63,8 +72,14 @@ export async function gerarEPDFDownloadExpo({ peixes, lote }: Props): Promise<vo
           <div class="meta">
             <div><b>Fêmeas:</b> ${lote.quantidadeF ?? 0}</div>
             <div><b>Machos:</b> ${lote.quantidadeM ?? 0}</div>
-            <div><b>Quantidade total:</b> ${lote.quantidade ?? peixes.length}</div>
-            <div><b>Peso total:</b> ${typeof lote.pesoTotal === "string" ? lote.pesoTotal : (lote.pesoTotal ?? "")} kg</div>
+            <div><b>Quantidade total:</b> ${
+              lote.quantidade ?? peixes.length
+            }</div>
+            <div><b>Peso total:</b> ${
+              typeof lote.pesoTotal === "string"
+                ? lote.pesoTotal
+                : lote.pesoTotal ?? ""
+            } kg</div>
           </div>
 
           <table>
@@ -88,30 +103,58 @@ export async function gerarEPDFDownloadExpo({ peixes, lote }: Props): Promise<vo
       `;
     }
 
-    // --- Paginando em blocos de 40 linhas ---
     const chunks = chunk(peixes, 40);
     const pagesHtml = chunks.map((grupo, idx) => renderPage(grupo, idx)).join("");
 
-    // --- HTML final (uma única vez) ---
     const htmlContent = `
       <html>
         <head>
           <meta charset="utf-8" />
           <style>
-            @page { size: A4; margin: 16mm 12mm; }
+            @page {
+              size: A4;
+              margin: 16mm 12mm;
+            }
+
             body {
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
               color: #222;
               font-size: 11px;
             }
-            h1, h2, h3 { margin: 0 0 6px; }
-            .header { text-align: center; margin-bottom: 8px; }
-            .meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0 10px; }
-            .meta b { font-weight: 600; }
 
-            table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-            thead { display: table-header-group; } /* repete cabeçalho por página */
-            tr { page-break-inside: avoid; }
+            h1, h2, h3 {
+              margin: 0 0 6px;
+            }
+
+            .header {
+              text-align: center;
+              margin-bottom: 8px;
+            }
+
+            .meta {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px 16px;
+              margin: 8px 0 10px;
+            }
+
+            .meta b {
+              font-weight: 600;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              table-layout: fixed;
+            }
+
+            thead {
+              display: table-header-group;
+            }
+
+            tr {
+              page-break-inside: avoid;
+            }
 
             th, td {
               border: 1px solid #ddd;
@@ -122,39 +165,75 @@ export async function gerarEPDFDownloadExpo({ peixes, lote }: Props): Promise<vo
               text-overflow: ellipsis;
               font-size: 10px;
             }
+
             th {
               background: #1a73e8;
               color: #fff;
               font-size: 10.5px;
             }
 
-            /* Larguras aproximadas para caber bem */
-            th:nth-child(1), td:nth-child(1) { width: 22%; }
-            th:nth-child(2), td:nth-child(2) { width: 18%; }
-            th:nth-child(3), td:nth-child(3) { width: 8%;  text-align: center; }
-            th:nth-child(4), td:nth-child(4) { width: 10%; }
-            th:nth-child(5), td:nth-child(5) { width: 12%; }
-            th:nth-child(6), td:nth-child(6) { width: 12%; }
-            th:nth-child(7), td:nth-child(7) { width: 8%;  text-align: center; }
-            th:nth-child(8), td:nth-child(8) { width: 10%; }
+            th:nth-child(1), td:nth-child(1) {
+              width: 22%;
+            }
 
-            .section { page-break-after: auto; }
+            th:nth-child(2), td:nth-child(2) {
+              width: 18%;
+            }
+
+            th:nth-child(3), td:nth-child(3) {
+              width: 8%;
+              text-align: center;
+            }
+
+            th:nth-child(4), td:nth-child(4) {
+              width: 10%;
+            }
+
+            th:nth-child(5), td:nth-child(5) {
+              width: 12%;
+            }
+
+            th:nth-child(6), td:nth-child(6) {
+              width: 12%;
+            }
+
+            th:nth-child(7), td:nth-child(7) {
+              width: 8%;
+              text-align: center;
+            }
+
+            th:nth-child(8), td:nth-child(8) {
+              width: 10%;
+            }
+
+            .section {
+              page-break-after: auto;
+            }
           </style>
         </head>
+
         <body>
           ${pagesHtml}
         </body>
       </html>
     `;
 
-    // --- Gera PDF (sem width/height) ---
-    const { uri } = await Print.printToFileAsync({ html: htmlContent, base64: false });
+    const { uri } = await Print.printToFileAsync({
+      html: htmlContent,
+      base64: false,
+    });
 
-    // --- Move e compartilha ---
-    const novoUri = `${FileSystem.documentDirectory}relatorioPescas.pdf`;
-    await FileSystem.moveAsync({ from: uri, to: novoUri });
+    const timestamp = Date.now();
+    const novoUri = `${FileSystem.documentDirectory}relatorio-pescas-${timestamp}.pdf`;
 
-    if (await Sharing.isAvailableAsync()) {
+    await FileSystem.moveAsync({
+      from: uri,
+      to: novoUri,
+    });
+
+    const canShare = await Sharing.isAvailableAsync();
+
+    if (canShare) {
       await Sharing.shareAsync(novoUri, {
         mimeType: "application/pdf",
         dialogTitle: "Baixar PDF",

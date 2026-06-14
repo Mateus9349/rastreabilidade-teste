@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, Platform, TouchableOpacity, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import {
+    Text,
+    TouchableRipple,
+    useTheme,
+} from 'react-native-paper';
 
 interface DateInputProps {
     label: string;
@@ -8,24 +13,61 @@ interface DateInputProps {
     onChange: (date: Date) => void;
 }
 
-const DateInput: React.FC<DateInputProps> = ({ label, value, onChange }) => {
+const DateInput: React.FC<DateInputProps> = ({
+    label,
+    value,
+    onChange,
+}) => {
+    const theme = useTheme();
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     const handleDateChange = (event: any, selectedDate?: Date) => {
         if (selectedDate) {
             onChange(selectedDate);
         }
+
         if (Platform.OS !== 'ios') {
-            setShowDatePicker(false); // Fechar o picker no Android após seleção
+            setShowDatePicker(false);
         }
     };
 
     return (
-        <View style={{width: '95%', alignSelf: 'center', marginTop: 10}}>
-            <Text style={{ color: '#FFFFFF', marginBottom: 5 }}>{label}</Text>
-            <TouchableOpacity style={styles.container} onPress={() => setShowDatePicker(true)}>
-                <Text style={{ color: '#FFFFFF' }}>{value.toLocaleDateString('pt-BR')}</Text>
-            </TouchableOpacity>
+        <View style={styles.wrapper}>
+            <Text
+                variant="labelLarge"
+                style={[
+                    styles.label,
+                    {
+                        color: theme.colors.onSurfaceVariant,
+                    },
+                ]}
+            >
+                {label}
+            </Text>
+
+            <TouchableRipple
+                onPress={() => setShowDatePicker(true)}
+                borderless
+                style={[
+                    styles.container,
+                    {
+                        borderColor: theme.colors.outline,
+                        backgroundColor: theme.colors.surface,
+                    },
+                ]}
+            >
+                <Text
+                    variant="bodyMedium"
+                    style={[
+                        styles.value,
+                        {
+                            color: theme.colors.onSurface,
+                        },
+                    ]}
+                >
+                    {value.toLocaleDateString('pt-BR')}
+                </Text>
+            </TouchableRipple>
 
             {showDatePicker && (
                 <DateTimePicker
@@ -42,15 +84,22 @@ const DateInput: React.FC<DateInputProps> = ({ label, value, onChange }) => {
 export default DateInput;
 
 const styles = StyleSheet.create({
+    wrapper: {
+        width: '100%',
+        gap: 6,
+    },
+    label: {
+        fontWeight: '600',
+    },
     container: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 'auto',
-        minWidth: '50%',
+        minHeight: 44,
         borderWidth: 1,
-        borderColor: '#BBBBBB',
-        borderRadius: 8,
-        height: 44,
-        marginBottom: 14
-    }
+        borderRadius: 12,
+        justifyContent: 'center',
+        paddingHorizontal: 14,
+        overflow: 'hidden',
+    },
+    value: {
+        textAlign: 'left',
+    },
 });

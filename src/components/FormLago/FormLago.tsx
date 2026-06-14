@@ -1,11 +1,21 @@
-// src/components/FormLago.tsx
-import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
-import * as Location from "expo-location";
-import { Picker } from "@react-native-picker/picker";
-import type { ILago } from "../../interfaces/Lago";
-import type { IComunidade } from "../../interfaces/Comunidade";
-import { useLocalComunidades } from "../../hooks/LocalData/comunidade/useLocalComunidades";
+// src/components/FormLago/FormLago.tsx
+
+import React, { useEffect, useMemo, useState } from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
+import {
+    ActivityIndicator,
+    Button,
+    Surface,
+    Text,
+    TextInput,
+    useTheme,
+} from 'react-native-paper';
+import * as Location from 'expo-location';
+import { Picker } from '@react-native-picker/picker';
+
+import type { ILago } from '../../interfaces/Lago';
+import type { IComunidade } from '../../interfaces/Comunidade';
+import { useLocalComunidades } from '../../hooks/LocalData/comunidade/useLocalComunidades';
 
 interface FormLagoProps {
     lago?: ILago;
@@ -13,17 +23,22 @@ interface FormLagoProps {
     onCancel?: () => void;
 }
 
-export default function FormLago({ lago, onSubmit, onCancel }: FormLagoProps) {
-    const [nome, setNome] = useState("");
-    const [latitude, setLatitude] = useState("");
-    const [longitude, setLongitude] = useState("");
-    const [comunidadeId, setComunidadeId] = useState<string>("");
+export default function FormLago({
+    lago,
+    onSubmit,
+    onCancel,
+}: FormLagoProps) {
+    const theme = useTheme();
+
+    const [nome, setNome] = useState('');
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
+    const [comunidadeId, setComunidadeId] = useState<string>('');
 
     const { comunidades, listarComunidades } = useLocalComunidades();
     const [loadingComunidades, setLoadingComunidades] = useState(true);
 
     useEffect(() => {
-        // Carrega comunidades ao montar
         (async () => {
             try {
                 await listarComunidades();
@@ -35,16 +50,26 @@ export default function FormLago({ lago, onSubmit, onCancel }: FormLagoProps) {
 
     useEffect(() => {
         if (lago) {
-            setNome(lago.nome ?? "");
-            setLatitude(lago.latitude?.toString() ?? "");
-            setLongitude(lago.longitude?.toString() ?? "");
-            setComunidadeId(lago.comunidadeId != null ? String(lago.comunidadeId) : "");
+            setNome(lago.nome ?? '');
+            setLatitude(lago.latitude?.toString() ?? '');
+            setLongitude(lago.longitude?.toString() ?? '');
+            setComunidadeId(
+                lago.comunidadeId != null ? String(lago.comunidadeId) : ''
+            );
         }
     }, [lago]);
 
     const handleSave = async () => {
-        if (!nome.trim() || !latitude.trim() || !longitude.trim() || !comunidadeId.trim()) {
-            Alert.alert("Atenção", "Preencha todos os campos ou capte as coordenadas.");
+        if (
+            !nome.trim() ||
+            !latitude.trim() ||
+            !longitude.trim() ||
+            !comunidadeId.trim()
+        ) {
+            Alert.alert(
+                'Atenção',
+                'Preencha todos os campos ou capte as coordenadas.'
+            );
             return;
         }
 
@@ -59,109 +84,225 @@ export default function FormLago({ lago, onSubmit, onCancel }: FormLagoProps) {
 
             await onSubmit(dados);
 
-            setNome("");
-            setLatitude("");
-            setLongitude("");
-            setComunidadeId("");
+            setNome('');
+            setLatitude('');
+            setLongitude('');
+            setComunidadeId('');
 
-            Alert.alert("Sucesso", lago ? "Lago atualizado!" : "Lago criado!");
+            Alert.alert('Sucesso', lago ? 'Lago atualizado!' : 'Lago criado!');
         } catch (error) {
             console.error(error);
-            Alert.alert("Erro", "Não foi possível salvar o lago. Tente novamente.");
+            Alert.alert(
+                'Erro',
+                'Não foi possível salvar o lago. Tente novamente.'
+            );
         }
     };
 
     const handleCapturarLocalizacao = async () => {
         try {
-            const { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
-                Alert.alert("Permissão negada", "Não foi possível acessar a localização.");
+            const { status } =
+                await Location.requestForegroundPermissionsAsync();
+
+            if (status !== 'granted') {
+                Alert.alert(
+                    'Permissão negada',
+                    'Não foi possível acessar a localização.'
+                );
                 return;
             }
+
             const location = await Location.getCurrentPositionAsync({});
+
             setLatitude(location.coords.latitude.toString());
             setLongitude(location.coords.longitude.toString());
         } catch {
-            Alert.alert("Erro", "Não foi possível capturar a localização.");
+            Alert.alert('Erro', 'Não foi possível capturar a localização.');
         }
     };
 
     const comunidadesOrdenadas = useMemo<IComunidade[]>(() => {
         return [...(comunidades ?? [])].sort((a, b) =>
-            (a.nome ?? "").localeCompare(b.nome ?? "", "pt-BR", { sensitivity: "base" })
+            (a.nome ?? '').localeCompare(b.nome ?? '', 'pt-BR', {
+                sensitivity: 'base',
+            })
         );
     }, [comunidades]);
 
+    const isSaveDisabled =
+        loadingComunidades || comunidadesOrdenadas.length === 0;
+
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Nome do Lago</Text>
+            <Text
+                variant="titleMedium"
+                style={[
+                    styles.formTitle,
+                    {
+                        color: theme.colors.primary,
+                    },
+                ]}
+            >
+                {lago ? 'Editar lago' : 'Novo lago'}
+            </Text>
+
             <TextInput
-                style={styles.input}
+                mode="outlined"
+                dense
+                label="Nome do lago"
                 value={nome}
                 onChangeText={setNome}
                 placeholder="Ex.: Lago Mamirauá"
             />
 
-            <Text style={styles.label}>Latitude</Text>
             <TextInput
-                style={styles.input}
+                mode="outlined"
+                dense
+                label="Latitude"
                 value={latitude}
                 onChangeText={setLatitude}
                 placeholder="Digite a latitude"
                 keyboardType="numeric"
             />
 
-            <Text style={styles.label}>Longitude</Text>
             <TextInput
-                style={styles.input}
+                mode="outlined"
+                dense
+                label="Longitude"
                 value={longitude}
                 onChangeText={setLongitude}
                 placeholder="Digite a longitude"
                 keyboardType="numeric"
             />
 
-            <Text style={styles.label}>Comunidade</Text>
-            <View style={styles.pickerWrapper}>
-                {loadingComunidades ? (
-                    <View style={styles.center}>
-                        <ActivityIndicator />
-                        <Text style={{ marginTop: 8 }}>Carregando comunidades…</Text>
-                    </View>
-                ) : comunidadesOrdenadas.length === 0 ? (
-                    <View style={styles.center}>
-                        <Text style={{ color: "#555" }}>Nenhuma comunidade cadastrada.</Text>
-                        <Text style={{ color: "#555" }}>Cadastre uma comunidade antes de criar um lago.</Text>
-                    </View>
-                ) : (
-                    <Picker
-                        selectedValue={comunidadeId}
-                        onValueChange={(val) => setComunidadeId(val)}
-                    >
-                        <Picker.Item label="Selecione a comunidade" value="" />
-                        {comunidadesOrdenadas.map((c) => (
-                            <Picker.Item key={String(c.id)} label={c.nome ?? `#${c.id}`} value={String(c.id)} />
-                        ))}
-                    </Picker>
-                )}
+            <View style={styles.fieldGroup}>
+                <Text
+                    variant="labelLarge"
+                    style={[
+                        styles.label,
+                        {
+                            color: theme.colors.onSurfaceVariant,
+                        },
+                    ]}
+                >
+                    Comunidade
+                </Text>
+
+                <Surface
+                    mode="flat"
+                    style={[
+                        styles.pickerWrapper,
+                        {
+                            backgroundColor: theme.colors.surface,
+                            borderColor: theme.colors.outline,
+                        },
+                    ]}
+                >
+                    {loadingComunidades ? (
+                        <View style={styles.center}>
+                            <ActivityIndicator size="small" />
+
+                            <Text
+                                variant="bodySmall"
+                                style={[
+                                    styles.helperText,
+                                    {
+                                        color: theme.colors.onSurfaceVariant,
+                                    },
+                                ]}
+                            >
+                                Carregando comunidades...
+                            </Text>
+                        </View>
+                    ) : comunidadesOrdenadas.length === 0 ? (
+                        <View style={styles.center}>
+                            <Text
+                                variant="bodySmall"
+                                style={[
+                                    styles.emptyText,
+                                    {
+                                        color: theme.colors.onSurfaceVariant,
+                                    },
+                                ]}
+                            >
+                                Nenhuma comunidade cadastrada.
+                            </Text>
+
+                            <Text
+                                variant="bodySmall"
+                                style={[
+                                    styles.emptyText,
+                                    {
+                                        color: theme.colors.onSurfaceVariant,
+                                    },
+                                ]}
+                            >
+                                Cadastre uma comunidade antes de criar um lago.
+                            </Text>
+                        </View>
+                    ) : (
+                        <Picker
+                            selectedValue={comunidadeId}
+                            onValueChange={(val) => setComunidadeId(val)}
+                            style={[
+                                styles.picker,
+                                {
+                                    color: theme.colors.onSurface,
+                                },
+                            ]}
+                            dropdownIconColor={theme.colors.primary}
+                        >
+                            <Picker.Item
+                                label="Selecione a comunidade"
+                                value=""
+                            />
+
+                            {comunidadesOrdenadas.map((comunidade) => (
+                                <Picker.Item
+                                    key={String(comunidade.id)}
+                                    label={
+                                        comunidade.nome ??
+                                        `#${comunidade.id}`
+                                    }
+                                    value={String(comunidade.id)}
+                                />
+                            ))}
+                        </Picker>
+                    )}
+                </Surface>
             </View>
 
-            <TouchableOpacity style={styles.captureButton} onPress={handleCapturarLocalizacao}>
-                <Text style={styles.captureText}>📍 Captar localização atual</Text>
-            </TouchableOpacity>
+            <Button
+                mode="contained-tonal"
+                icon="map-marker"
+                onPress={handleCapturarLocalizacao}
+                style={styles.locationButton}
+                contentStyle={styles.buttonContent}
+            >
+                Captar localização atual
+            </Button>
 
-            <View style={styles.row}>
+            <View style={styles.actions}>
                 {onCancel && (
-                    <TouchableOpacity style={[styles.button, styles.cancel]} onPress={onCancel}>
-                        <Text style={styles.buttonText}>Cancelar</Text>
-                    </TouchableOpacity>
+                    <Button
+                        mode="outlined"
+                        onPress={onCancel}
+                        style={styles.actionButton}
+                        contentStyle={styles.buttonContent}
+                    >
+                        Cancelar
+                    </Button>
                 )}
-                <TouchableOpacity
-                    style={[styles.button, styles.save]}
+
+                <Button
+                    mode="contained"
                     onPress={handleSave}
-                    disabled={loadingComunidades || comunidadesOrdenadas.length === 0}
+                    disabled={isSaveDisabled}
+                    style={styles.actionButton}
+                    contentStyle={styles.buttonContent}
                 >
-                    <Text style={styles.buttonText}>{lago ? "Atualizar" : "Criar"}</Text>
-                </TouchableOpacity>
+                    {lago ? 'Atualizar' : 'Criar'}
+                </Button>
             </View>
         </View>
     );
@@ -169,67 +310,56 @@ export default function FormLago({ lago, onSubmit, onCancel }: FormLagoProps) {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
-        borderRadius: 12,
-        backgroundColor: "#fff",
         gap: 12,
     },
-    label: {
-        fontWeight: "600",
-        fontSize: 14,
-        color: "#333",
+    formTitle: {
+        fontWeight: '700',
+        marginBottom: 4,
     },
-    input: {
-        borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-        fontSize: 14,
-        backgroundColor: "#fafafa",
+    fieldGroup: {
+        gap: 6,
+    },
+    label: {
+        fontWeight: '600',
     },
     pickerWrapper: {
         borderWidth: 1,
-        borderColor: "#ccc",
-        borderRadius: 8,
-        overflow: "hidden",
-        backgroundColor: "#fafafa",
+        borderRadius: 12,
+        overflow: 'hidden',
+        minHeight: 48,
+        justifyContent: 'center',
     },
-    captureButton: {
+    picker: {
+        minHeight: 48,
+    },
+    center: {
+        minHeight: 72,
+        padding: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    helperText: {
         marginTop: 8,
-        padding: 10,
-        backgroundColor: "#1976d2",
-        borderRadius: 8,
-        alignItems: "center",
+        textAlign: 'center',
     },
-    captureText: {
-        color: "#fff",
-        fontWeight: "600",
+    emptyText: {
+        textAlign: 'center',
+        lineHeight: 18,
     },
-    row: {
-        flexDirection: "row",
-        justifyContent: "flex-end",
+    locationButton: {
+        marginTop: 4,
+        borderRadius: 12,
+    },
+    actions: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
         gap: 10,
         marginTop: 12,
     },
-    button: {
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        borderRadius: 8,
+    actionButton: {
+        borderRadius: 12,
     },
-    save: {
-        backgroundColor: "#2e7d32",
-    },
-    cancel: {
-        backgroundColor: "#b71c1c",
-    },
-    buttonText: {
-        color: "#fff",
-        fontWeight: "600",
-    },
-    center: {
-        padding: 12,
-        alignItems: "center",
-        justifyContent: "center",
+    buttonContent: {
+        minHeight: 44,
     },
 });
